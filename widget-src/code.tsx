@@ -636,7 +636,7 @@ interface CategorySectionProps {
   onUpdateProfile: (profile: Profile) => void
   onDeleteProfile: (id: string) => void
   onAddProfile: () => void
-  onEditCategory: () => void
+  onEditCategory: () => void | Promise<void>
   onDeleteCategory: () => void
 }
 
@@ -1093,9 +1093,8 @@ function UserProfilesWidget() {
       .sort((a, b) => a.id.localeCompare(b.id))
   }
 
-  // Helper: Edit category
   function editCategory(category: Category) {
-    showCategoryFormUI(category)
+    return showCategoryFormUI(category)
   }
 
   // Helper: Delete category
