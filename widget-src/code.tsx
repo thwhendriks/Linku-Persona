@@ -178,18 +178,19 @@ interface MiniCardProps {
   number: number
   colors: ColorScheme
   onExpand: () => void
+  isSelected?: boolean
 }
 
-function MiniCard({ profile, number, colors, onExpand }: MiniCardProps) {
+function MiniCard({ profile, number, colors, onExpand, isSelected = false }: MiniCardProps) {
   return (
     <AutoLayout
       direction="horizontal"
       spacing={10}
       padding={{ vertical: 10, horizontal: 12 }}
       cornerRadius={10}
-      fill="#FFFFFF"
-      stroke={colors.border}
-      strokeWidth={1}
+      fill={isSelected ? colors.bgLight : "#FFFFFF"}
+      stroke={isSelected ? colors.accent : colors.border}
+      strokeWidth={isSelected ? 2 : 1}
       onClick={onExpand}
       hoverStyle={{ fill: colors.bgLight }}
     >
@@ -260,12 +261,13 @@ function ExpandedCard({
   return (
     <AutoLayout
       direction="vertical"
-      spacing={0}
-      cornerRadius={16}
+      spacing={12}
+      padding={16}
+      cornerRadius={12}
       fill={colors.bg}
       stroke={colors.accent}
       strokeWidth={2}
-      width={340}
+      width="fill-parent"
     >
       {/* Header */}
       <AutoLayout
@@ -663,14 +665,14 @@ function CategorySection({
   return (
     <AutoLayout
       direction="vertical"
-      spacing={10}
+      spacing={6}
       width="fill-parent"
     >
       {/* Category header */}
       <AutoLayout
         direction="horizontal"
         spacing={10}
-        padding={{ vertical: 8, horizontal: 12 }}
+        padding={{ vertical: 6, horizontal: 10 }}
         fill={colors.bg}
         cornerRadius={10}
         width="fill-parent"
@@ -750,31 +752,21 @@ function CategorySection({
       {profiles.length > 0 ? (
         <AutoLayout
           direction="horizontal"
-          spacing={10}
+          spacing={8}
           wrap={true}
           width="fill-parent"
         >
           {profiles.map((profile) => {
             const profileNumber = getProfileNumber(profile)
 
-            return expandedId === profile.id ? (
-              <ExpandedCard
-                key={profile.id}
-                profile={profile}
-                number={profileNumber}
-                category={category}
-                colors={colors}
-                onCollapse={() => onExpand(null)}
-                onUpdate={onUpdateProfile}
-                onDelete={() => onDeleteProfile(profile.id)}
-              />
-            ) : (
+            return (
               <MiniCard
                 key={profile.id}
                 profile={profile}
                 number={profileNumber}
                 colors={colors}
                 onExpand={() => onExpand(profile.id)}
+                isSelected={expandedId === profile.id}
               />
             )
           })}
@@ -790,6 +782,67 @@ function CategorySection({
           </Text>
         </AutoLayout>
       )}
+    </AutoLayout>
+  )
+}
+
+// ============================================================================
+// COMPONENTS: Detail Panel (Right Side)
+// ============================================================================
+
+interface DetailPanelProps {
+  expandedProfile: Profile | null
+  profileNumber: number
+  category: Category | null
+  onCollapse: () => void
+  onUpdate: (profile: Profile) => void
+  onDelete: () => void
+}
+
+function DetailPanel({
+  expandedProfile,
+  profileNumber,
+  category,
+  onCollapse,
+  onUpdate,
+  onDelete,
+}: DetailPanelProps) {
+  if (!expandedProfile || !category) {
+    return (
+      <AutoLayout
+        direction="vertical"
+        padding={24}
+        width={320}
+        height="fill-parent"
+        horizontalAlignItems="center"
+        verticalAlignItems="center"
+        fill="#F9FAFB"
+        cornerRadius={12}
+      >
+        <Text fontSize={13} fill="#9CA3AF" fontFamily="Inter">
+          Klik op een profiel om{'\n'}details te bekijken
+        </Text>
+      </AutoLayout>
+    )
+  }
+
+  const colors = COLORS[category.colorKey] || COLORS.pink
+
+  return (
+    <AutoLayout
+      direction="vertical"
+      width={320}
+      height="fill-parent"
+    >
+      <ExpandedCard
+        profile={expandedProfile}
+        number={profileNumber}
+        category={category}
+        colors={colors}
+        onCollapse={onCollapse}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+      />
     </AutoLayout>
   )
 }
@@ -1110,8 +1163,30 @@ function UserProfilesWidget() {
     figma.notify(`Categorie "${category.name}" verwijderd`)
   }
 
+  // Auto-select first profile on initial load
+  useEffect(() => {
+    if (!expandedId && profilesMap.size > 0) {
+      const firstProfile = Array.from(profilesMap.values())
+        .sort((a, b) => a.id.localeCompare(b.id))[0]
+      if (firstProfile) {
+        setExpandedId(firstProfile.id)
+      }
+    }
+  })
+
   // Calculate totals
   const totalProfiles = profilesMap.size
+
+  // Get expanded profile and category
+  const expandedProfile: Profile | null = expandedId ? (profilesMap.get(expandedId) ?? null) : null
+  const expandedCategory: Category | null = expandedProfile
+    ? (categories.find(cat => cat.id === expandedProfile.categoryId) ?? null)
+    : null
+  const expandedProfileNumber = expandedProfile
+    ? Array.from(profilesMap.values())
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .findIndex(p => p.id === expandedProfile.id) + 1
+    : 0
 
   // Render
   return (
@@ -1123,7 +1198,7 @@ function UserProfilesWidget() {
       fill="#FFFFFF"
       stroke="#E5E7EB"
       strokeWidth={1}
-      minWidth={400}
+      minWidth={720}
     >
       {/* Widget header */}
       <AutoLayout
@@ -1175,42 +1250,65 @@ function UserProfilesWidget() {
         fill="#F3F4F6"
       />
 
-      {/* Categories with profiles */}
-      {categories
-        .sort((a, b) => a.order - b.order)
-        .map((category) => (
-          <CategorySection
-            key={category.id}
-            category={category}
-            profiles={getProfilesForCategory(category.id)}
-            allProfiles={profilesMap}
-            expandedId={expandedId}
-            onExpand={setExpandedId}
-            onUpdateProfile={updateProfile}
-            onDeleteProfile={deleteProfile}
-            onAddProfile={() => addProfile(category.id)}
-            onEditCategory={() => editCategory(category)}
-            onDeleteCategory={() => deleteCategory(category)}
-          />
-        ))}
-
-      {/* Empty state */}
-      {categories.length === 0 && (
+      {/* Main content area: horizontal layout */}
+      <AutoLayout
+        direction="horizontal"
+        spacing={16}
+        width="fill-parent"
+      >
+        {/* Left panel: Categories with profiles (fixed width) */}
         <AutoLayout
           direction="vertical"
-          spacing={8}
-          padding={32}
-          horizontalAlignItems="center"
-          width="fill-parent"
+          spacing={12}
+          width={280}
         >
-          <Text fontSize={14} fill="#9CA3AF" fontFamily="Inter">
-            Nog geen categorieën
-          </Text>
-          <Text fontSize={12} fill="#D1D5DB" fontFamily="Inter">
-            Klik rechts op de widget → "Categorie toevoegen"
-          </Text>
+          {categories
+            .sort((a, b) => a.order - b.order)
+            .map((category) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                profiles={getProfilesForCategory(category.id)}
+                allProfiles={profilesMap}
+                expandedId={expandedId}
+                onExpand={setExpandedId}
+                onUpdateProfile={updateProfile}
+                onDeleteProfile={deleteProfile}
+                onAddProfile={() => addProfile(category.id)}
+                onEditCategory={() => editCategory(category)}
+                onDeleteCategory={() => deleteCategory(category)}
+              />
+            ))}
+
+          {/* Empty state */}
+          {categories.length === 0 && (
+            <AutoLayout
+              direction="vertical"
+              spacing={8}
+              padding={32}
+              horizontalAlignItems="center"
+              width="fill-parent"
+            >
+              <Text fontSize={14} fill="#9CA3AF" fontFamily="Inter">
+                Nog geen categorieën
+              </Text>
+              <Text fontSize={12} fill="#D1D5DB" fontFamily="Inter">
+                Klik rechts op de widget → "Categorie toevoegen"
+              </Text>
+            </AutoLayout>
+          )}
         </AutoLayout>
-      )}
+
+        {/* Right panel: Detail view (always visible) */}
+        <DetailPanel
+          expandedProfile={expandedProfile}
+          profileNumber={expandedProfileNumber}
+          category={expandedCategory}
+          onCollapse={() => setExpandedId(null)}
+          onUpdate={updateProfile}
+          onDelete={() => deleteProfile(expandedId!)}
+        />
+      </AutoLayout>
     </AutoLayout>
   )
 }
