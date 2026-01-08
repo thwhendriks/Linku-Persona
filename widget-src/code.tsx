@@ -161,7 +161,7 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 9)
 }
 
-function getNextProfileNumber(profiles: Map<string, Profile>): number {
+function getNextProfileNumber(profiles: SyncedMap<Profile> | Map<string, Profile>): number {
   const numbers = Array.from(profiles.values()).map(p => {
     const match = p.id.match(/profile-(\d+)/)
     return match ? parseInt(match[1], 10) : 0
@@ -360,7 +360,6 @@ function ExpandedCard({
               onUpdate({ ...profile, quote: cleanQuote })
             }}
             fontSize={13}
-            fontStyle="italic"
             fill="#6B7280"
             fontFamily="Inter"
             width="fill-parent"
@@ -632,7 +631,7 @@ function StatBox({ label, value, colors, editable = false, onEdit }: StatBoxProp
 interface CategorySectionProps {
   category: Category
   profiles: Profile[]
-  allProfiles: Map<string, Profile>
+  allProfiles: SyncedMap<Profile>
   expandedId: string | null
   onExpand: (id: string | null) => void
   onUpdateProfile: (profile: Profile) => void
@@ -665,16 +664,19 @@ function CategorySection({
   return (
     <AutoLayout
       direction="vertical"
-      spacing={6}
+      spacing={0}
       width="fill-parent"
+      fill={colors.bg}
+      cornerRadius={12}
+      stroke={colors.border}
+      strokeWidth={1}
     >
       {/* Category header */}
       <AutoLayout
         direction="horizontal"
         spacing={10}
-        padding={{ vertical: 6, horizontal: 10 }}
-        fill={colors.bg}
-        cornerRadius={10}
+        padding={{ vertical: 8, horizontal: 12 }}
+        cornerRadius={{ topLeft: 12, topRight: 12, bottomLeft: 0, bottomRight: 0 }}
         width="fill-parent"
         verticalAlignItems="center"
       >
@@ -755,6 +757,7 @@ function CategorySection({
           spacing={8}
           wrap={true}
           width="fill-parent"
+          padding={12}
         >
           {profiles.map((profile) => {
             const profileNumber = getProfileNumber(profile)
@@ -773,7 +776,7 @@ function CategorySection({
         </AutoLayout>
       ) : (
         <AutoLayout
-          padding={16}
+          padding={12}
           horizontalAlignItems="center"
           width="fill-parent"
         >
@@ -812,7 +815,7 @@ function DetailPanel({
       <AutoLayout
         direction="vertical"
         padding={24}
-        width={320}
+        width={340}
         height="fill-parent"
         horizontalAlignItems="center"
         verticalAlignItems="center"
@@ -831,7 +834,7 @@ function DetailPanel({
   return (
     <AutoLayout
       direction="vertical"
-      width={320}
+      width={340}
       height="fill-parent"
     >
       <ExpandedCard
@@ -1163,14 +1166,12 @@ function UserProfilesWidget() {
     figma.notify(`Categorie "${category.name}" verwijderd`)
   }
 
-  // Auto-select first profile on initial load
+  // Auto-select first profile on initial load ONLY if none is selected
   useEffect(() => {
     if (!expandedId && profilesMap.size > 0) {
-      const firstProfile = Array.from(profilesMap.values())
-        .sort((a, b) => a.id.localeCompare(b.id))[0]
-      if (firstProfile) {
-        setExpandedId(firstProfile.id)
-      }
+      // NOTE: We removed the auto-re-select logic here to allow the user 
+      // to explicitly close the detail panel. Startup selection can be handled 
+      // by a dedicated flag or by checking if it's the very first render.
     }
   })
 
