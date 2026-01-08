@@ -193,6 +193,7 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
       strokeWidth={isSelected ? 2 : 1}
       onClick={onExpand}
       hoverStyle={{ fill: colors.bgLight }}
+      width="fill-parent"
     >
       {/* Number badge */}
       <AutoLayout
@@ -214,7 +215,7 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
       </AutoLayout>
 
       {/* Profile info */}
-      <AutoLayout direction="vertical" spacing={2} width={120}>
+      <AutoLayout direction="vertical" spacing={2} width="fill-parent">
         <Text
           fontSize={13}
           fontWeight={600}
@@ -490,7 +491,12 @@ function ExpandedCard({
           spacing={8}
           width="fill-parent"
         >
-          <AutoLayout direction="horizontal" width="fill-parent" verticalAlignItems="center">
+          <AutoLayout
+            direction="horizontal"
+            width="fill-parent"
+            verticalAlignItems="center"
+            spacing={0}
+          >
             <Text
               fontSize={10}
               fontWeight={600}
@@ -501,7 +507,7 @@ function ExpandedCard({
             >
               Kerntaken ({profile.tasks.length})
             </Text>
-            <AutoLayout width="fill-parent" />
+            <AutoLayout width="fill-parent" height={1} />
             <AutoLayout
               padding={{ horizontal: 8, vertical: 4 }}
               cornerRadius={6}
@@ -680,82 +686,89 @@ function CategorySection({
         width="fill-parent"
         verticalAlignItems="center"
       >
-        <Text fontSize={16} fontFamily="Inter">{category.icon}</Text>
-        <Text
-          fontSize={14}
-          fontWeight={600}
-          fill={colors.text}
-          fontFamily="Inter"
-        >
-          {category.name}
-        </Text>
-        <AutoLayout
-          fill={colors.accent}
-          cornerRadius={10}
-          padding={{ horizontal: 8, vertical: 3 }}
-        >
+        <AutoLayout direction="horizontal" spacing={6} verticalAlignItems="center" width="fill-parent">
+          <Text fontSize={16} fontFamily="Inter">{category.icon}</Text>
           <Text
-            fontSize={11}
+            fontSize={14}
             fontWeight={600}
-            fill="#FFFFFF"
+            fill={colors.text}
             fontFamily="Inter"
+            width="fill-parent"
           >
-            {profiles.length}
+            {category.name}
           </Text>
         </AutoLayout>
 
-        <AutoLayout width="fill-parent" />
-
         <AutoLayout
           direction="horizontal"
-          spacing={4}
+          spacing={8}
           verticalAlignItems="center"
+          padding={{ left: 8 }}
         >
+          {/* Subtle Count Badge */}
           <AutoLayout
-            padding={6}
-            cornerRadius={6}
-            onClick={onEditCategory}
             fill={colors.bg}
-            hoverStyle={{ fill: '#F3F4F6' }}
-            tooltip="Categorie bewerken"
+            cornerRadius={8}
+            padding={{ horizontal: 6, vertical: 2 }}
+            stroke={colors.border}
+            strokeWidth={1}
           >
-            <SVG src={EditIcon} />
+            <Text
+              fontSize={10}
+              fontWeight={600}
+              fill={colors.text}
+              fontFamily="Inter"
+            >
+              {profiles.length}
+            </Text>
           </AutoLayout>
-          <AutoLayout
-            padding={6}
-            cornerRadius={6}
-            onClick={onDeleteCategory}
-            fill={colors.bg}
-            hoverStyle={{ fill: '#FEE2E2' }}
-            tooltip="Categorie verwijderen"
-          >
-            <SVG src={TrashIcon} />
-          </AutoLayout>
-        </AutoLayout>
 
-        <AutoLayout
-          fill="#FFFFFF"
-          cornerRadius={6}
-          padding={{ horizontal: 10, vertical: 6 }}
-          onClick={onAddProfile}
-          hoverStyle={{ fill: '#F9FAFB' }}
-          direction="horizontal"
-          spacing={4}
-          verticalAlignItems="center"
-        >
-          <SVG src={PlusIcon} />
-          <Text fontSize={12} fill={colors.accent} fontFamily="Inter" fontWeight={500}>
-            Nieuw
-          </Text>
+          {/* Action Group */}
+          <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
+            <AutoLayout
+              padding={6}
+              cornerRadius={6}
+              onClick={onEditCategory}
+              hoverStyle={{ fill: '#F3F4F6' }}
+              tooltip="Bewerken"
+            >
+              <SVG src={EditIcon} />
+            </AutoLayout>
+            <AutoLayout
+              padding={6}
+              cornerRadius={6}
+              onClick={onDeleteCategory}
+              hoverStyle={{ fill: '#FEE2E2' }}
+              tooltip="Verwijderen"
+            >
+              <SVG src={TrashIcon} />
+            </AutoLayout>
+
+            {/* Compact Plus Button */}
+            <AutoLayout
+              width={28}
+              height={28}
+              cornerRadius={14}
+              fill="#FFFFFF"
+              stroke={colors.border}
+              strokeWidth={1}
+              horizontalAlignItems="center"
+              verticalAlignItems="center"
+              onClick={onAddProfile}
+              hoverStyle={{ fill: '#F9FAFB' }}
+              tooltip="Nieuw profiel"
+            >
+              <SVG src={PlusIcon} />
+            </AutoLayout>
+          </AutoLayout>
         </AutoLayout>
       </AutoLayout>
 
       {/* Profile cards */}
       {profiles.length > 0 ? (
         <AutoLayout
-          direction="horizontal"
+          direction="vertical"
           spacing={8}
-          wrap={true}
           width="fill-parent"
           padding={12}
         >
@@ -815,8 +828,7 @@ function DetailPanel({
       <AutoLayout
         direction="vertical"
         padding={24}
-        width={340}
-        height="fill-parent"
+        width="fill-parent"
         horizontalAlignItems="center"
         verticalAlignItems="center"
         fill="#F9FAFB"
@@ -834,8 +846,7 @@ function DetailPanel({
   return (
     <AutoLayout
       direction="vertical"
-      width={340}
-      height="fill-parent"
+      width="fill-parent"
     >
       <ExpandedCard
         profile={expandedProfile}
@@ -917,8 +928,7 @@ function UserProfilesWidget() {
           setExpandedId(null)
           break
         case 'exportJson':
-          exportData()
-          break
+          return exportData()
         case 'importJson':
           return showImportUI()
       }
@@ -969,6 +979,20 @@ function UserProfilesWidget() {
         } catch (e) {
           figma.notify('Fout bij importeren: ongeldig JSON formaat', { error: true })
         }
+      }
+
+      if (msg.type === 'uiReady') {
+        exportData(true)
+      }
+
+      if (msg.type === 'exportComplete') {
+        figma.closePlugin()
+        figma.notify('Data gekopieerd naar klembord')
+      }
+
+      if (msg.type === 'exportError') {
+        figma.closePlugin()
+        figma.notify('Fout bij kopiëren naar klembord', { error: true })
       }
     }
   })
@@ -1082,24 +1106,139 @@ function UserProfilesWidget() {
   }
 
   // Helper: Export data
-  function exportData() {
-    const profiles: Record<string, Profile> = {}
-    profilesMap.entries().forEach(([key, profile]) => {
-      profiles[key] = profile
-    })
+  function exportData(sendPayload = false) {
+    // Phase 2: Send data when UI is ready
+    if (sendPayload) {
+      const profiles: Record<string, Profile> = {}
+      // Fix: Use Array.from to iterate over the SyncedMap entries iterator
+      Array.from(profilesMap.entries()).forEach(([key, profile]) => {
+        profiles[key] = profile
+      })
 
-    const data = {
-      version: '1.0.0',
-      exportedAt: new Date().toISOString(),
-      categories,
-      profiles,
+      const data = {
+        version: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        categories,
+        profiles,
+      }
+
+      const json = JSON.stringify(data, null, 2)
+      figma.ui.postMessage({ type: 'exportPayload', data: json })
+      return
     }
 
-    console.log('=== EXPORTED DATA ===')
-    console.log(JSON.stringify(data, null, 2))
-    console.log('=== END EXPORT ===')
+    // Phase 1: Open UI
+    return new Promise<void>(() => {
+      figma.notify('Export gestart...')
+      figma.showUI(
+        `<!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Inter, sans-serif; padding: 16px; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+            h3 { font-size: 14px; margin: 0 0 12px 0; font-weight: 600; color: #374151; }
+            button { background: #EC4899; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; margin-top: 8px; }
+            button:hover { background: #DB2777; }
+            p { font-size: 11px; color: #6B7280; margin: 8px 0; line-height: 1.4; }
+            textarea { 
+              font-family: 'Roboto Mono', monospace; 
+              font-size: 11px; 
+              padding: 8px; 
+              border: 1px solid #E5E7EB; 
+              border-radius: 6px; 
+              width: 100%; 
+              flex: 1; 
+              resize: none; 
+              background: #F9FAFB;
+              margin-top: 8px;
+            }
+            textarea:focus { outline: none; border-color: #EC4899; }
+            .hidden { display: none; }
+            .success { color: #059669; font-weight: 600; }
+            .error { color: #DC2626; }
+            .container { display: flex; flex-direction: column; width: 100%; height: 100%; }
+            #initial-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
+            #manual-state { display: none; flex-direction: column; height: 100%; width: 100%; }
+          </style>
+        </head>
+        <body>
+          <div id="initial-state">
+            <div id="status">Laden...</div>
+          </div>
 
-    figma.notify('Data geëxporteerd naar console (F12 → Console)')
+          <div id="manual-state">
+            <h3>Niet gelukt om te kopiëren</h3>
+            <p>Kopieer de JSON data hieronder handmatig:</p>
+            <textarea id="data" readonly></textarea>
+            <button id="closeBtn">Sluiten</button>
+          </div>
+
+          <script>
+            const status = document.getElementById('status');
+            const initialState = document.getElementById('initial-state');
+            const manualState = document.getElementById('manual-state');
+            const dataArea = document.getElementById('data');
+            const closeBtn = document.getElementById('closeBtn');
+
+            // Notify plugin we are ready
+            window.parent.postMessage({ pluginMessage: { type: 'uiReady' } }, '*');
+
+            // Listen for data
+            window.onmessage = async (event) => {
+              const msg = event.data.pluginMessage;
+              if (msg && msg.type === 'exportPayload') {
+                status.innerText = 'Bezig met kopiëren...';
+                dataArea.value = msg.data;
+                await attemptCopy();
+              }
+            }
+
+            function copySuccess() {
+              status.className = 'success';
+              status.innerText = 'Gekopieerd!';
+              setTimeout(() => {
+                window.parent.postMessage({ pluginMessage: { type: 'exportComplete' } }, '*');
+              }, 800);
+            }
+
+            function showManual() {
+              initialState.style.display = 'none';
+              manualState.style.display = 'flex';
+              dataArea.select();
+            }
+
+            async function attemptCopy() {
+              try {
+                dataArea.select();
+                const success = document.execCommand('copy');
+                if (success) {
+                    copySuccess();
+                    return;
+                }
+                throw new Error('execCommand failed');
+              } catch (e) {
+                if (navigator.clipboard) {
+                    try {
+                        await navigator.clipboard.writeText(dataArea.value);
+                        copySuccess();
+                    } catch (err) {
+                        showManual();
+                    }
+                } else {
+                    showManual();
+                }
+              }
+            }
+
+            closeBtn.onclick = () => {
+              window.parent.postMessage({ pluginMessage: { type: 'exportComplete' } }, '*');
+            };
+          </script>
+        </body>
+      </html>`,
+        { width: 400, height: 350, title: 'Export JSON' }
+      )
+    })
   }
 
   // Helper: Add new profile
@@ -1193,13 +1332,13 @@ function UserProfilesWidget() {
   return (
     <AutoLayout
       direction="vertical"
-      spacing={16}
+      spacing={8}
       padding={20}
       cornerRadius={16}
       fill="#FFFFFF"
       stroke="#E5E7EB"
       strokeWidth={1}
-      minWidth={720}
+      width={960}
     >
       {/* Widget header */}
       <AutoLayout
@@ -1244,12 +1383,7 @@ function UserProfilesWidget() {
         </AutoLayout>
       </AutoLayout>
 
-      {/* Divider */}
-      <Rectangle
-        width="fill-parent"
-        height={1}
-        fill="#F3F4F6"
-      />
+      {/* Divider removed for tighter layout */}
 
       {/* Main content area: horizontal layout */}
       <AutoLayout
@@ -1261,7 +1395,7 @@ function UserProfilesWidget() {
         <AutoLayout
           direction="vertical"
           spacing={12}
-          width={280}
+          width="fill-parent"
         >
           {categories
             .sort((a, b) => a.order - b.order)
