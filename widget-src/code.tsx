@@ -323,7 +323,7 @@ function ExpandedCard({
             fill="#1F2937"
             fontFamily="Inter"
             width="fill-parent"
-            inputBehavior="truncate"
+            inputBehavior="multiline"
           />
         </AutoLayout>
 
@@ -367,44 +367,6 @@ function ExpandedCard({
             inputBehavior="multiline"
           />
         </AutoLayout>
-      </AutoLayout>
-
-      {/* Stats row */}
-      <AutoLayout
-        direction="horizontal"
-        spacing={8}
-        padding={16}
-        width="fill-parent"
-      >
-        <StatBox
-          label="Taken"
-          value={profile.tasks.length.toString()}
-          colors={colors}
-        />
-        <StatBox
-          label="Niveau"
-          value={profile.level}
-          colors={colors}
-          editable={true}
-          onEdit={() => {
-            const levels: Profile['level'][] = ['Basis', 'Gevorderd', 'Expert']
-            const currentIndex = levels.indexOf(profile.level)
-            const nextLevel = levels[(currentIndex + 1) % levels.length]
-            onUpdate({ ...profile, level: nextLevel })
-          }}
-        />
-        <StatBox
-          label="Org"
-          value={profile.orgSize}
-          colors={colors}
-          editable={true}
-          onEdit={() => {
-            const sizes: Profile['orgSize'][] = ['S', 'M', 'L', 'XL', 'Alle', 'Extern']
-            const currentIndex = sizes.indexOf(profile.orgSize)
-            const nextSize = sizes[(currentIndex + 1) % sizes.length]
-            onUpdate({ ...profile, orgSize: nextSize })
-          }}
-        />
       </AutoLayout>
 
       {/* Context tags */}
