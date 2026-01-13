@@ -272,7 +272,7 @@ function ExpandedCard({
     <AutoLayout
       direction="vertical"
       spacing={12}
-      padding={16}
+      padding={24}
       cornerRadius={12}
       fill={colors.bg}
       stroke={colors.accent}
@@ -283,7 +283,6 @@ function ExpandedCard({
       <AutoLayout
         direction="horizontal"
         spacing={12}
-        padding={16}
         width="fill-parent"
         verticalAlignItems="start"
       >
@@ -363,7 +362,6 @@ function ExpandedCard({
 
       {/* Quote section */}
       <AutoLayout
-        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
@@ -390,7 +388,6 @@ function ExpandedCard({
 
       {/* Context tags */}
       <AutoLayout
-        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
@@ -425,7 +422,6 @@ function ExpandedCard({
 
       {/* Description */}
       <AutoLayout
-        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
@@ -461,7 +457,6 @@ function ExpandedCard({
 
       {/* Tasks section */}
       <AutoLayout
-        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
@@ -548,7 +543,6 @@ function ExpandedCard({
 
       {/* Footer with delete */}
       <AutoLayout
-        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
