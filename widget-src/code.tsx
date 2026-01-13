@@ -134,11 +134,13 @@ const DEFAULT_CATEGORIES: Category[] = []
 // ICONS (SVG)
 // ============================================================================
 
-const PlusIcon = `
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EC4899" stroke-width="2.5">
+function getPlusIcon(color: string): string {
+  return `
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5">
   <path d="M12 5v14M5 12h14"/>
 </svg>
 `
+}
 
 const CloseIcon = `
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
@@ -739,7 +741,7 @@ function CategorySection({
               hoverStyle={{ fill: '#F9FAFB' }}
               tooltip="Nieuw profiel"
             >
-              <SVG src={PlusIcon} />
+              <SVG src={getPlusIcon(colors.accent)} />
             </AutoLayout>
           </AutoLayout>
         </AutoLayout>
