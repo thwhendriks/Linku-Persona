@@ -31,7 +31,7 @@ interface Profile {
   id: string
   name: string
   shortName: string
-  categoryId: string
+  categoryId: string  // Empty string = uncategorized
   level: 'Basis' | 'Gevorderd' | 'Expert'
   orgSize: 'S' | 'M' | 'L' | 'XL' | 'Alle' | 'Extern'
   description: string
@@ -848,7 +848,7 @@ function UserProfilesWidget() {
       {
         itemType: 'action',
         propertyName: 'addProfile',
-        tooltip: 'Nieuw profiel toevoegen',
+        tooltip: 'Profiel toevoegen',
       },
       {
         itemType: 'action',
@@ -860,16 +860,8 @@ function UserProfilesWidget() {
       },
       {
         itemType: 'action',
-        propertyName: 'collapseAll',
-        tooltip: 'Alles inklappen',
-      },
-      {
-        itemType: 'separator',
-      },
-      {
-        itemType: 'action',
         propertyName: 'exportJson',
-        tooltip: 'Exporteer als JSON',
+        tooltip: 'Exporteer JSON',
       },
       {
         itemType: 'action',
@@ -886,9 +878,6 @@ function UserProfilesWidget() {
           break
         case 'addCategory':
           return showCategoryFormUI()
-        case 'collapseAll':
-          setExpandedId(null)
-          break
         case 'exportJson':
           return exportData()
         case 'importJson':
@@ -1390,7 +1379,7 @@ function UserProfilesWidget() {
                 Nog geen categorieën
               </Text>
               <Text fontSize={12} fill="#D1D5DB" fontFamily="Inter">
-                Klik rechts op de widget → "Categorie toevoegen"
+                Klik op de widget → "Categorie toevoegen"
               </Text>
             </AutoLayout>
           )}
