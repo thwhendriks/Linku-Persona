@@ -910,7 +910,7 @@ function UserProfilesWidget() {
 
   // Handle UI messages
   useEffect(() => {
-    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string }) => {
+    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string; deleteType?: string }) => {
       if (msg.type === 'addCategory' && msg.name) {
         const newCategory: Category = {
           id: `cat-${generateId()}`,
@@ -975,6 +975,23 @@ function UserProfilesWidget() {
           figma.closePlugin()
           figma.notify('Categorie bijgewerkt')
         }
+      }
+
+      if (msg.type === 'confirmDelete' && msg.deleteType && msg.id) {
+        if (msg.deleteType === 'profile') {
+          deleteProfile(msg.id)
+          figma.notify('Profiel verwijderd')
+        } else if (msg.deleteType === 'category') {
+          const cat = categories.find(c => c.id === msg.id)
+          if (cat) {
+            actualDeleteCategory(cat)
+          }
+        }
+        figma.closePlugin()
+      }
+
+      if (msg.type === 'cancelDelete') {
+        figma.closePlugin()
       }
     }
   })
@@ -1045,6 +1062,62 @@ function UserProfilesWidget() {
         </body>
         </html>`,
         { width: 280, height: 260 }
+      )
+    })
+  }
+
+  // Helper: Show delete confirmation UI
+  function showDeleteConfirmationUI(
+    type: 'profile' | 'category',
+    id: string,
+    name: string
+  ) {
+    const title = type === 'profile' ? 'Profiel verwijderen' : 'Categorie verwijderen'
+    const message = type === 'profile' 
+      ? `Weet je zeker dat je "${name}" wilt verwijderen?`
+      : `Weet je zeker dat je categorie "${name}" wilt verwijderen?`
+    
+    return new Promise<void>(() => {
+      figma.showUI(
+        `<!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: Inter, -apple-system, sans-serif; padding: 16px; background: #fff; }
+            h3 { font-size: 14px; margin-bottom: 12px; color: #1f2937; font-weight: 600; }
+            p { font-size: 13px; color: #6b7280; margin-bottom: 20px; line-height: 1.5; }
+            .buttons { display: flex; gap: 8px; }
+            button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+            .cancel { background: #F3F4F6; color: #374151; }
+            .cancel:hover { background: #E5E7EB; }
+            .delete { background: #EF4444; color: white; }
+            .delete:hover { background: #DC2626; }
+          </style>
+        </head>
+        <body>
+          <h3>${title}</h3>
+          <p>${message}</p>
+          <input type="hidden" id="id" value="${id}">
+          <input type="hidden" id="type" value="${type}">
+          <div class="buttons">
+            <button class="cancel" id="cancel">Annuleren</button>
+            <button class="delete" id="delete">Verwijderen</button>
+          </div>
+          <script>
+            document.getElementById('cancel').onclick = () => {
+              parent.postMessage({ pluginMessage: { type: 'cancelDelete' } }, '*')
+            }
+            document.getElementById('delete').onclick = () => {
+              const id = document.getElementById('id').value
+              const deleteType = document.getElementById('type').value
+              parent.postMessage({ pluginMessage: { type: 'confirmDelete', deleteType, id } }, '*')
+            }
+            document.getElementById('cancel').focus()
+          </script>
+        </body>
+        </html>`,
+        { width: 320, height: 180, title: title }
       )
     })
   }
@@ -1320,7 +1393,7 @@ function UserProfilesWidget() {
     return showCategoryFormUI(category)
   }
 
-  // Helper: Delete category
+  // Helper: Delete category (with confirmation)
   function deleteCategory(category: Category) {
     const profiles = getProfilesForCategory(category.id)
     if (profiles.length > 0) {
@@ -1328,6 +1401,11 @@ function UserProfilesWidget() {
       return
     }
 
+    return showDeleteConfirmationUI('category', category.id, category.name)
+  }
+
+  // Helper: Actually delete category (called after confirmation)
+  function actualDeleteCategory(category: Category) {
     const newCategories = categories.filter(c => c.id !== category.id)
     setCategories(newCategories)
     figma.notify(`Categorie "${category.name}" verwijderd`)
@@ -1509,7 +1587,11 @@ function UserProfilesWidget() {
           category={expandedCategory}
           onCollapse={() => setExpandedId(null)}
           onUpdate={updateProfile}
-          onDelete={() => deleteProfile(expandedId!)}
+          onDelete={() => {
+            if (expandedProfile) {
+              return showDeleteConfirmationUI('profile', expandedProfile.id, expandedProfile.name)
+            }
+          }}
           onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
         />
       </AutoLayout>
