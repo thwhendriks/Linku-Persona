@@ -48,7 +48,7 @@ interface Category {
   order: number
 }
 
-type ColorKey = 'pink' | 'teal' | 'purple' | 'amber' | 'sky' | 'rose' | 'indigo' | 'emerald'
+type ColorKey = 'pink' | 'teal' | 'purple' | 'amber' | 'sky' | 'rose' | 'indigo' | 'emerald' | 'gray'
 
 interface ColorScheme {
   bg: string
@@ -118,6 +118,13 @@ const COLORS: Record<ColorKey, ColorScheme> = {
     accent: '#10B981',
     text: '#047857',
     border: '#6EE7B7',
+  },
+  gray: {
+    bg: '#F9FAFB',
+    bgLight: '#F9FAFB',
+    accent: '#6B7280',
+    text: '#374151',
+    border: '#D1D5DB',
   },
 }
 
@@ -243,11 +250,12 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
 interface ExpandedCardProps {
   profile: Profile
   number: number
-  category: Category
+  category: Category | null
   colors: ColorScheme
   onCollapse: () => void
   onUpdate: (profile: Profile) => void
   onDelete: () => void
+  onEditCategory: () => void
 }
 
 function ExpandedCard({
@@ -258,6 +266,7 @@ function ExpandedCard({
   onCollapse,
   onUpdate,
   onDelete,
+  onEditCategory,
 }: ExpandedCardProps) {
   return (
     <AutoLayout
@@ -299,9 +308,18 @@ function ExpandedCard({
 
         {/* Title section */}
         <AutoLayout direction="vertical" spacing={4} width="fill-parent">
-          <AutoLayout direction="horizontal" spacing={6} verticalAlignItems="center">
+          <AutoLayout 
+            direction="horizontal" 
+            spacing={6} 
+            verticalAlignItems="center"
+            padding={{ horizontal: 8, vertical: 4 }}
+            cornerRadius={6}
+            onClick={onEditCategory}
+            hoverStyle={{ fill: '#F3F4F6' }}
+            tooltip="Categorie wijzigen"
+          >
             <Text fontSize={12} fill={colors.text} fontFamily="Inter">
-              {category.icon}
+              {category?.icon || '📂'}
             </Text>
             <Text
               fontSize={11}
@@ -311,8 +329,9 @@ function ExpandedCard({
               textCase="upper"
               letterSpacing={0.5}
             >
-              {category.name}
+              {category?.name || 'Geen categorie'}
             </Text>
+            <SVG src={EditIcon} />
           </AutoLayout>
           <Input
             value={profile.name}
@@ -775,6 +794,7 @@ interface DetailPanelProps {
   onCollapse: () => void
   onUpdate: (profile: Profile) => void
   onDelete: () => void
+  onEditCategory: () => void
 }
 
 function DetailPanel({
@@ -784,8 +804,9 @@ function DetailPanel({
   onCollapse,
   onUpdate,
   onDelete,
+  onEditCategory,
 }: DetailPanelProps) {
-  if (!expandedProfile || !category) {
+  if (!expandedProfile) {
     return (
       <AutoLayout
         direction="vertical"
@@ -803,7 +824,8 @@ function DetailPanel({
     )
   }
 
-  const colors = COLORS[category.colorKey] || COLORS.pink
+  // Use gray color scheme for uncategorized profiles
+  const colors = category ? (COLORS[category.colorKey] || COLORS.pink) : COLORS.gray
 
   return (
     <AutoLayout
@@ -818,6 +840,7 @@ function DetailPanel({
         onCollapse={onCollapse}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        onEditCategory={onEditCategory}
       />
     </AutoLayout>
   )
@@ -872,9 +895,8 @@ function UserProfilesWidget() {
     ({ propertyName }) => {
       switch (propertyName) {
         case 'addProfile':
-          if (categories.length > 0) {
-            addProfile(categories[0].id)
-          }
+          // Add uncategorized profile (categoryId = '')
+          addProfile('')
           break
         case 'addCategory':
           return showCategoryFormUI()
@@ -888,7 +910,7 @@ function UserProfilesWidget() {
 
   // Handle UI messages
   useEffect(() => {
-    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string }) => {
+    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string }) => {
       if (msg.type === 'addCategory' && msg.name) {
         const newCategory: Category = {
           id: `cat-${generateId()}`,
@@ -944,6 +966,15 @@ function UserProfilesWidget() {
       if (msg.type === 'exportError') {
         figma.closePlugin()
         figma.notify('Fout bij kopiëren naar klembord', { error: true })
+      }
+
+      if (msg.type === 'updateProfileCategory' && msg.profileId) {
+        const profile = profilesMap.get(msg.profileId)
+        if (profile) {
+          updateProfile({ ...profile, categoryId: msg.categoryId || '' })
+          figma.closePlugin()
+          figma.notify('Categorie bijgewerkt')
+        }
       }
     }
   })
@@ -1052,6 +1083,52 @@ function UserProfilesWidget() {
         </body>
         </html>`,
         { width: 320, height: 340 }
+      )
+    })
+  }
+
+  // Helper: Show category picker UI for profile
+  function showCategoryPickerUI(profileId: string, currentCategoryId: string) {
+    const categoryOptions = [
+      `<option value="" ${currentCategoryId === '' ? 'selected' : ''}>Geen categorie</option>`,
+      ...categories.map(cat =>
+        `<option value="${cat.id}" ${currentCategoryId === cat.id ? 'selected' : ''}>${cat.icon} ${cat.name}</option>`
+      )
+    ].join('')
+
+    return new Promise<void>(() => {
+      figma.showUI(
+        `<!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: Inter, -apple-system, sans-serif; padding: 16px; background: #fff; }
+            h3 { font-size: 14px; margin-bottom: 16px; color: #1f2937; }
+            label { display: block; font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+            select { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
+            select:focus { outline: none; border-color: #EC4899; }
+            button { width: 100%; padding: 12px; background: #EC4899; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+            button:hover { background: #DB2777; }
+          </style>
+        </head>
+        <body>
+          <h3>Selecteer categorie</h3>
+          <input type="hidden" id="profileId" value="${profileId}">
+          <label>Categorie</label>
+          <select id="categoryId">${categoryOptions}</select>
+          <button id="submit">Opslaan</button>
+          <script>
+            document.getElementById('submit').onclick = () => {
+              const profileId = document.getElementById('profileId').value
+              const categoryId = document.getElementById('categoryId').value
+              parent.postMessage({ pluginMessage: { type: 'updateProfileCategory', profileId, categoryId } }, '*')
+            }
+            document.getElementById('categoryId').focus()
+          </script>
+        </body>
+        </html>`,
+        { width: 280, height: 200 }
       )
     })
   }
@@ -1331,6 +1408,23 @@ function UserProfilesWidget() {
               </Text>
             </AutoLayout>
           ))}
+          {/* Show uncategorized count if there are any */}
+          {getProfilesForCategory('').length > 0 && (
+            <AutoLayout
+              key="uncategorized"
+              width={24}
+              height={24}
+              cornerRadius={6}
+              fill={COLORS.gray.accent}
+              horizontalAlignItems="center"
+              verticalAlignItems="center"
+              tooltip="Ongecategoriseerd"
+            >
+              <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
+                {getProfilesForCategory('').length}
+              </Text>
+            </AutoLayout>
+          )}
         </AutoLayout>
       </AutoLayout>
 
@@ -1366,8 +1460,31 @@ function UserProfilesWidget() {
               />
             ))}
 
+          {/* Uncategorized section */}
+          {getProfilesForCategory('').length > 0 && (
+            <CategorySection
+              key="uncategorized"
+              category={{
+                id: '',
+                name: 'Ongecategoriseerd',
+                icon: '📂',
+                colorKey: 'gray',
+                order: 999,
+              }}
+              profiles={getProfilesForCategory('')}
+              allProfiles={profilesMap}
+              expandedId={expandedId}
+              onExpand={setExpandedId}
+              onUpdateProfile={updateProfile}
+              onDeleteProfile={deleteProfile}
+              onAddProfile={() => addProfile('')}
+              onEditCategory={() => {}}
+              onDeleteCategory={() => {}}
+            />
+          )}
+
           {/* Empty state */}
-          {categories.length === 0 && (
+          {categories.length === 0 && profilesMap.size === 0 && (
             <AutoLayout
               direction="vertical"
               spacing={8}
@@ -1393,6 +1510,7 @@ function UserProfilesWidget() {
           onCollapse={() => setExpandedId(null)}
           onUpdate={updateProfile}
           onDelete={() => deleteProfile(expandedId!)}
+          onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
         />
       </AutoLayout>
     </AutoLayout>
