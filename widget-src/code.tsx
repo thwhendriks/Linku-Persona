@@ -285,7 +285,7 @@ function ExpandedCard({
         spacing={12}
         padding={16}
         width="fill-parent"
-        verticalAlignItems="center"
+        verticalAlignItems="start"
       >
         {/* Number badge - large */}
         <AutoLayout
@@ -425,7 +425,7 @@ function ExpandedCard({
 
       {/* Description */}
       <AutoLayout
-        padding={16}
+        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
       >
         <AutoLayout
@@ -548,20 +548,26 @@ function ExpandedCard({
 
       {/* Footer with delete */}
       <AutoLayout
-        padding={12}
+        padding={{ horizontal: 16, vertical: 0 }}
         width="fill-parent"
-        horizontalAlignItems="center"
-        fill="#FFFFFF"
       >
         <AutoLayout
-          padding={{ horizontal: 12, vertical: 6 }}
-          cornerRadius={6}
-          onClick={onDelete}
-          hoverStyle={{ fill: '#FEE2E2' }}
+          fill="#FFFFFF"
+          cornerRadius={10}
+          padding={12}
+          width="fill-parent"
+          horizontalAlignItems="center"
         >
-          <Text fontSize={11} fill="#EF4444" fontFamily="Inter">
-            Profiel verwijderen
-          </Text>
+          <AutoLayout
+            padding={{ horizontal: 12, vertical: 6 }}
+            cornerRadius={6}
+            onClick={onDelete}
+            hoverStyle={{ fill: '#FEE2E2' }}
+          >
+            <Text fontSize={11} fill="#EF4444" fontFamily="Inter">
+              Profiel verwijderen
+            </Text>
+          </AutoLayout>
         </AutoLayout>
       </AutoLayout>
     </AutoLayout>
