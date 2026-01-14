@@ -38,6 +38,7 @@ interface Profile {
   quote: string
   tasks: string[]
   context: string
+  customFields?: Record<string, string>  // fieldId -> value
 }
 
 interface Category {
@@ -56,6 +57,27 @@ interface ColorScheme {
   accent: string
   text: string
   border: string
+}
+
+// Field configuration (stored globally)
+interface FieldConfig {
+  id: string
+  label: string
+  isBuiltIn: boolean        // true for quote, context, description, tasks
+  builtInKey?: 'quote' | 'context' | 'description' | 'tasks'
+  isVisible: boolean
+  order: number
+}
+
+// Global widget settings (simplified)
+interface WidgetSettings {
+  fields: FieldConfig[]
+}
+
+// Legacy support for tasksModule (backwards compatibility)
+interface TasksModuleConfig {
+  isVisible: boolean
+  label: string
 }
 
 // ============================================================================
@@ -130,6 +152,19 @@ const COLORS: Record<ColorKey, ColorScheme> = {
 
 const DEFAULT_CATEGORIES: Category[] = []
 
+const DEFAULT_FIELD_CONFIG: FieldConfig[] = [
+  { id: 'quote', label: 'Quote', isBuiltIn: true, builtInKey: 'quote', isVisible: true, order: 0 },
+  { id: 'context', label: 'Context', isBuiltIn: true, builtInKey: 'context', isVisible: true, order: 1 },
+  { id: 'description', label: 'Omschrijving', isBuiltIn: true, builtInKey: 'description', isVisible: true, order: 2 },
+  { id: 'tasks', label: 'Taken', isBuiltIn: true, builtInKey: 'tasks', isVisible: true, order: 3 },
+]
+
+// Legacy support - kept for backwards compatibility
+const DEFAULT_TASKS_MODULE: TasksModuleConfig = {
+  isVisible: true,
+  label: 'Taken'
+}
+
 // ============================================================================
 // ICONS (SVG)
 // ============================================================================
@@ -162,12 +197,40 @@ const TrashIcon = `
 </svg>
 `
 
+const GearIcon = `
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+  <circle cx="12" cy="12" r="3"/>
+  <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.4 4.4l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.4-4.4l4.2-4.2"/>
+</svg>
+`
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 9)
+}
+
+// Helper: Get field value from profile (built-in or custom)
+// Note: 'tasks' is handled separately, not through this function
+function getFieldValue(profile: Profile, fieldConfig: FieldConfig): string {
+  if (fieldConfig.isBuiltIn && fieldConfig.builtInKey && fieldConfig.builtInKey !== 'tasks') {
+    return profile[fieldConfig.builtInKey] || ''
+  }
+  return profile.customFields?.[fieldConfig.id] || ''
+}
+
+// Helper: Set field value in profile (built-in or custom)
+// Note: 'tasks' is handled separately, not through this function
+function setFieldValue(profile: Profile, fieldConfig: FieldConfig, value: string): Profile {
+  if (fieldConfig.isBuiltIn && fieldConfig.builtInKey && fieldConfig.builtInKey !== 'tasks') {
+    return { ...profile, [fieldConfig.builtInKey]: value }
+  }
+  return {
+    ...profile,
+    customFields: { ...(profile.customFields || {}), [fieldConfig.id]: value }
+  }
 }
 
 function getNextProfileNumber(profiles: SyncedMap<Profile> | Map<string, Profile>): number {
@@ -239,6 +302,52 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
 }
 
 // ============================================================================
+// COMPONENTS: Dynamic Field (Configurable Field Renderer)
+// ============================================================================
+
+interface DynamicFieldProps {
+  config: FieldConfig
+  value: string
+  onChange: (value: string) => void
+}
+
+function DynamicField({ config, value, onChange }: DynamicFieldProps) {
+  return (
+    <AutoLayout width="fill-parent">
+      <AutoLayout
+        fill="#FFFFFF"
+        cornerRadius={10}
+        padding={12}
+        direction="vertical"
+        spacing={8}
+        width="fill-parent"
+      >
+        <Text
+          fontSize={10}
+          fontWeight={600}
+          fill="#6B7280"
+          fontFamily="Inter"
+          textCase="upper"
+          letterSpacing={0.5}
+        >
+          {config.label}
+        </Text>
+        <Input
+          value={value}
+          placeholder={`${config.label}...`}
+          onTextEditEnd={(e) => onChange(e.characters)}
+          fontSize={13}
+          fill="#1F2937"
+          fontFamily="Inter"
+          width="fill-parent"
+          inputBehavior="multiline"
+        />
+      </AutoLayout>
+    </AutoLayout>
+  )
+}
+
+// ============================================================================
 // COMPONENTS: Expanded Card (Detail View)
 // ============================================================================
 
@@ -251,6 +360,7 @@ interface ExpandedCardProps {
   onUpdate: (profile: Profile) => void
   onDelete: () => void
   onEditCategory: () => void
+  widgetSettings: WidgetSettings
 }
 
 function ExpandedCard({
@@ -262,7 +372,99 @@ function ExpandedCard({
   onUpdate,
   onDelete,
   onEditCategory,
+  widgetSettings,
 }: ExpandedCardProps) {
+  // Sort fields by order, filter visible
+  const visibleFields = widgetSettings.fields
+    .filter(f => f.isVisible)
+    .sort((a, b) => a.order - b.order)
+
+  // Helper to render tasks field
+  const renderTasksField = (fieldConfig: FieldConfig) => (
+    <AutoLayout key={fieldConfig.id} width="fill-parent">
+      <AutoLayout
+        fill="#FFFFFF"
+        cornerRadius={10}
+        padding={12}
+        direction="vertical"
+        spacing={8}
+        width="fill-parent"
+      >
+        <AutoLayout
+          direction="horizontal"
+          width="fill-parent"
+          verticalAlignItems="center"
+          spacing={0}
+        >
+          <Text
+            fontSize={10}
+            fontWeight={600}
+            fill="#6B7280"
+            fontFamily="Inter"
+            textCase="upper"
+            letterSpacing={0.5}
+          >
+            {fieldConfig.label} ({profile.tasks.length})
+          </Text>
+          <AutoLayout width="fill-parent" height={1} />
+          <AutoLayout
+            padding={{ horizontal: 8, vertical: 4 }}
+            cornerRadius={6}
+            fill={colors.bgLight}
+            onClick={() => {
+              onUpdate({ ...profile, tasks: [...profile.tasks, 'Nieuwe taak'] })
+            }}
+            hoverStyle={{ fill: colors.border }}
+          >
+            <Text fontSize={11} fill={colors.text} fontFamily="Inter">+ Taak</Text>
+          </AutoLayout>
+        </AutoLayout>
+
+        {profile.tasks.length > 0 ? (
+          <AutoLayout direction="vertical" spacing={4} width="fill-parent">
+            {profile.tasks.map((task, index) => (
+              <AutoLayout
+                key={index}
+                direction="horizontal"
+                spacing={8}
+                width="fill-parent"
+                verticalAlignItems="center"
+              >
+                <AutoLayout
+                  width={6}
+                  height={6}
+                  cornerRadius={3}
+                  fill={colors.accent}
+                />
+                <Input
+                  value={task}
+                  placeholder="Taak..."
+                  onTextEditEnd={(e) => {
+                    const newTasks = [...profile.tasks]
+                    if (e.characters.trim() === '') {
+                      newTasks.splice(index, 1)
+                    } else {
+                      newTasks[index] = e.characters
+                    }
+                    onUpdate({ ...profile, tasks: newTasks })
+                  }}
+                  fontSize={12}
+                  fill="#1F2937"
+                  fontFamily="Inter"
+                  width="fill-parent"
+                />
+              </AutoLayout>
+            ))}
+          </AutoLayout>
+        ) : (
+          <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
+            Nog geen taken toegevoegd
+          </Text>
+        )}
+      </AutoLayout>
+    </AutoLayout>
+  )
+
   return (
     <AutoLayout
       direction="vertical"
@@ -355,186 +557,23 @@ function ExpandedCard({
         </AutoLayout>
       </AutoLayout>
 
-      {/* Quote section */}
-      <AutoLayout
-        width="fill-parent"
-      >
-        <AutoLayout
-          fill="#FFFFFF"
-          cornerRadius={10}
-          padding={12}
-          width="fill-parent"
-        >
-          <Input
-            value={profile.quote ? `"${profile.quote}"` : ''}
-            placeholder='"Voeg een quote toe..."'
-            onTextEditEnd={(e) => {
-              const cleanQuote = e.characters.replace(/^"|"$/g, '').trim()
-              onUpdate({ ...profile, quote: cleanQuote })
+      {/* Dynamic Fields - tasks field has special rendering */}
+      {visibleFields.map((fieldConfig) => {
+        if (fieldConfig.builtInKey === 'tasks') {
+          return renderTasksField(fieldConfig)
+        }
+        return (
+          <DynamicField
+            key={fieldConfig.id}
+            config={fieldConfig}
+            value={getFieldValue(profile, fieldConfig)}
+            onChange={(value) => {
+              const updatedProfile = setFieldValue(profile, fieldConfig, value)
+              onUpdate(updatedProfile)
             }}
-            fontSize={13}
-            fill="#1F2937"
-            fontFamily="Inter"
-            width="fill-parent"
-            inputBehavior="multiline"
           />
-        </AutoLayout>
-      </AutoLayout>
-
-      {/* Context tags */}
-      <AutoLayout
-        width="fill-parent"
-      >
-        <AutoLayout
-          fill="#FFFFFF"
-          cornerRadius={10}
-          padding={12}
-          direction="vertical"
-          spacing={8}
-          width="fill-parent"
-        >
-          <Text
-            fontSize={10}
-            fontWeight={600}
-            fill="#6B7280"
-            fontFamily="Inter"
-            textCase="upper"
-            letterSpacing={0.5}
-          >
-            Context
-          </Text>
-          <Input
-            value={profile.context}
-            placeholder="Bijv. Grote instellingen, Zorg, Onderwijs..."
-            onTextEditEnd={(e) => onUpdate({ ...profile, context: e.characters })}
-            fontSize={12}
-            fill="#1F2937"
-            fontFamily="Inter"
-            width="fill-parent"
-          />
-        </AutoLayout>
-      </AutoLayout>
-
-      {/* Description */}
-      <AutoLayout
-        width="fill-parent"
-      >
-        <AutoLayout
-          fill="#FFFFFF"
-          cornerRadius={10}
-          padding={12}
-          direction="vertical"
-          spacing={8}
-          width="fill-parent"
-        >
-          <Text
-            fontSize={10}
-            fontWeight={600}
-            fill="#6B7280"
-            fontFamily="Inter"
-            textCase="upper"
-            letterSpacing={0.5}
-          >
-            Omschrijving
-          </Text>
-          <Input
-            value={profile.description}
-            placeholder="Beschrijf dit profiel..."
-            onTextEditEnd={(e) => onUpdate({ ...profile, description: e.characters })}
-            fontSize={13}
-            fill="#1F2937"
-            fontFamily="Inter"
-            width="fill-parent"
-            inputBehavior="multiline"
-          />
-        </AutoLayout>
-      </AutoLayout>
-
-      {/* Tasks section */}
-      <AutoLayout
-        width="fill-parent"
-      >
-        <AutoLayout
-          fill="#FFFFFF"
-          cornerRadius={10}
-          padding={12}
-          direction="vertical"
-          spacing={8}
-          width="fill-parent"
-        >
-          <AutoLayout
-            direction="horizontal"
-            width="fill-parent"
-            verticalAlignItems="center"
-            spacing={0}
-          >
-            <Text
-              fontSize={10}
-              fontWeight={600}
-              fill="#6B7280"
-              fontFamily="Inter"
-              textCase="upper"
-              letterSpacing={0.5}
-            >
-              Kerntaken ({profile.tasks.length})
-            </Text>
-            <AutoLayout width="fill-parent" height={1} />
-            <AutoLayout
-              padding={{ horizontal: 8, vertical: 4 }}
-              cornerRadius={6}
-              fill={colors.bgLight}
-              onClick={() => {
-                onUpdate({ ...profile, tasks: [...profile.tasks, 'Nieuwe taak'] })
-              }}
-              hoverStyle={{ fill: colors.border }}
-            >
-              <Text fontSize={11} fill={colors.text} fontFamily="Inter">+ Taak</Text>
-            </AutoLayout>
-          </AutoLayout>
-
-          {profile.tasks.length > 0 ? (
-            <AutoLayout direction="vertical" spacing={4} width="fill-parent">
-              {profile.tasks.map((task, index) => (
-                <AutoLayout
-                  key={index}
-                  direction="horizontal"
-                  spacing={8}
-                  width="fill-parent"
-                  verticalAlignItems="center"
-                >
-                  <AutoLayout
-                    width={6}
-                    height={6}
-                    cornerRadius={3}
-                    fill={colors.accent}
-                  />
-                  <Input
-                    value={task}
-                    placeholder="Taak..."
-                    onTextEditEnd={(e) => {
-                      const newTasks = [...profile.tasks]
-                      if (e.characters.trim() === '') {
-                        newTasks.splice(index, 1)
-                      } else {
-                        newTasks[index] = e.characters
-                      }
-                      onUpdate({ ...profile, tasks: newTasks })
-                    }}
-                    fontSize={12}
-                    fill="#1F2937"
-                    fontFamily="Inter"
-                    width="fill-parent"
-                  />
-                </AutoLayout>
-              ))}
-            </AutoLayout>
-          ) : (
-            <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
-              Nog geen taken toegevoegd
-            </Text>
-          )}
-        </AutoLayout>
-      </AutoLayout>
+        )
+      })}
 
       {/* Footer with delete */}
       <AutoLayout
@@ -795,6 +834,7 @@ interface DetailPanelProps {
   onUpdate: (profile: Profile) => void
   onDelete: () => void
   onEditCategory: () => void
+  widgetSettings: WidgetSettings
 }
 
 function DetailPanel({
@@ -805,6 +845,7 @@ function DetailPanel({
   onUpdate,
   onDelete,
   onEditCategory,
+  widgetSettings,
 }: DetailPanelProps) {
   if (!expandedProfile) {
     return (
@@ -841,6 +882,7 @@ function DetailPanel({
         onUpdate={onUpdate}
         onDelete={onDelete}
         onEditCategory={onEditCategory}
+        widgetSettings={widgetSettings}
       />
     </AutoLayout>
   )
@@ -865,9 +907,42 @@ function UserProfilesWidget() {
   // State: widget title
   const [widgetTitle, setWidgetTitle] = useSyncedState('widgetTitle', 'Gebruikersprofielen')
 
+  // State: widget settings (field configuration)
+  const [widgetSettings, setWidgetSettings] = useSyncedState<WidgetSettings>('widgetSettings', {
+    fields: DEFAULT_FIELD_CONFIG
+  })
+
+  // Migration: ensure tasks field exists (for widgets created before tasks was added to fields)
+  const migratedSettings = (() => {
+    const hasTasksField = widgetSettings.fields.some(f => f.builtInKey === 'tasks')
+    if (!hasTasksField) {
+      // Check if there's a legacy tasksModule property
+      const legacySettings = widgetSettings as WidgetSettings & { tasksModule?: TasksModuleConfig }
+      const tasksLabel = legacySettings.tasksModule?.label || 'Taken'
+      const tasksVisible = legacySettings.tasksModule?.isVisible ?? true
+      const maxOrder = Math.max(...widgetSettings.fields.map(f => f.order), -1)
+      
+      return {
+        fields: [
+          ...widgetSettings.fields,
+          { id: 'tasks', label: tasksLabel, isBuiltIn: true, builtInKey: 'tasks' as const, isVisible: tasksVisible, order: maxOrder + 1 }
+        ]
+      }
+    }
+    return widgetSettings
+  })()
+
   // Property menu
   usePropertyMenu(
     [
+      {
+        itemType: 'action',
+        propertyName: 'openSettings',
+        tooltip: 'Widget instellingen',
+      },
+      {
+        itemType: 'separator',
+      },
       {
         itemType: 'action',
         propertyName: 'addProfile',
@@ -894,6 +969,8 @@ function UserProfilesWidget() {
     ],
     ({ propertyName }) => {
       switch (propertyName) {
+        case 'openSettings':
+          return showSettingsUI()
         case 'addProfile':
           // Add uncategorized profile (categoryId = '')
           addProfile('')
@@ -910,7 +987,7 @@ function UserProfilesWidget() {
 
   // Handle UI messages
   useEffect(() => {
-    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string; deleteType?: string }) => {
+    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string; deleteType?: string; settings?: WidgetSettings }) => {
       if (msg.type === 'addCategory' && msg.name) {
         const newCategory: Category = {
           id: `cat-${generateId()}`,
@@ -991,6 +1068,16 @@ function UserProfilesWidget() {
       }
 
       if (msg.type === 'cancelDelete') {
+        figma.closePlugin()
+      }
+
+      if (msg.type === 'updateSettings' && msg.settings) {
+        setWidgetSettings(msg.settings)
+        figma.closePlugin()
+        figma.notify('Instellingen opgeslagen')
+      }
+
+      if (msg.type === 'cancelSettings') {
         figma.closePlugin()
       }
     }
@@ -1365,6 +1452,205 @@ function UserProfilesWidget() {
         </body>
         </html>`,
         { width: 280, height: 200 }
+      )
+    })
+  }
+
+  // Helper: Show settings UI
+  function showSettingsUI() {
+    const settingsData = JSON.stringify(migratedSettings)
+    
+    return new Promise<void>(() => {
+      figma.showUI(
+        `<!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: Inter, -apple-system, sans-serif; padding: 16px; background: #fff; overflow-y: auto; height: 100vh; }
+            h3 { font-size: 16px; margin-bottom: 6px; color: #1f2937; font-weight: 600; }
+            .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+            input[type="text"] { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-family: Inter, -apple-system, sans-serif; }
+            input[type="text"]:focus { outline: none; border-color: #EC4899; }
+            input[type="text"]::placeholder { color: #9ca3af; }
+            .field-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+            .field-item { display: flex; gap: 8px; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; transition: border-color 0.15s; }
+            .field-item:hover { border-color: #d1d5db; }
+            .field-item.builtin { background: #fffbeb; border-color: #fef08a; }
+            .field-item.hidden { opacity: 0.5; }
+            .visibility-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; cursor: pointer; border-radius: 6px; transition: all 0.15s; border: 1px solid #e5e7eb; background: #fff; flex-shrink: 0; }
+            .visibility-btn:hover { background: #f9fafb; border-color: #d1d5db; }
+            .visibility-btn svg { width: 16px; height: 16px; }
+            .field-label-input { flex: 1; font-weight: 500; min-width: 0; }
+            .builtin-badge { font-size: 9px; background: #fef3c7; color: #92400e; padding: 2px 5px; border-radius: 3px; font-weight: 600; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.3px; }
+            .field-controls { display: flex; gap: 2px; flex-shrink: 0; }
+            .move-btn { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: #6b7280; }
+            .move-btn:hover:not(:disabled) { background: #f9fafb; border-color: #d1d5db; }
+            .move-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+            .move-btn svg { width: 12px; height: 12px; }
+            .delete-btn { background: #fff; border: 1px solid #fecaca; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: #dc2626; }
+            .delete-btn:hover { background: #fef2f2; border-color: #fca5a5; }
+            .delete-btn svg { width: 12px; height: 12px; }
+            .add-field-btn { width: 100%; padding: 10px; background: #f9fafb; color: #374151; border: 2px dashed #d1d5db; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+            .add-field-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
+            .buttons { display: flex; gap: 8px; margin-top: 20px; }
+            .buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+            .cancel-btn { background: #F3F4F6; color: #374151; }
+            .cancel-btn:hover { background: #E5E7EB; }
+            .save-btn { background: #EC4899; color: white; }
+            .save-btn:hover { background: #DB2777; }
+          </style>
+        </head>
+        <body>
+          <h3>Profielvelden</h3>
+          <p class="subtitle">Bepaal welke velden zichtbaar zijn en in welke volgorde</p>
+          
+          <div id="fieldList" class="field-list"></div>
+          <button type="button" class="add-field-btn" id="addFieldBtn">+ Nieuw veld toevoegen</button>
+          
+          <div class="buttons">
+            <button type="button" class="cancel-btn" id="cancelBtn">Annuleren</button>
+            <button type="button" class="save-btn" id="saveBtn">Opslaan</button>
+          </div>
+          
+          <script>
+            const settingsJson = '${settingsData.replace(/'/g, "\\'")}';
+            let settings;
+            try {
+              settings = JSON.parse(settingsJson);
+            } catch(e) {
+              console.error('Failed to parse settings:', e);
+              settings = { fields: [] };
+            }
+            
+            const eyeOpenSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+            const eyeClosedSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+            const arrowUpSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>';
+            const arrowDownSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+            const trashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+            
+            function renderFields() {
+              const list = document.getElementById('fieldList');
+              list.innerHTML = '';
+              
+              const sortedFields = [...settings.fields].sort((a, b) => a.order - b.order);
+              
+              sortedFields.forEach((field, index) => {
+                const item = document.createElement('div');
+                item.className = 'field-item' + (field.isBuiltIn ? ' builtin' : '') + (field.isVisible ? '' : ' hidden');
+                
+                // Visibility button
+                const visBtn = document.createElement('button');
+                visBtn.type = 'button';
+                visBtn.className = 'visibility-btn';
+                visBtn.innerHTML = field.isVisible ? eyeOpenSvg : eyeClosedSvg;
+                visBtn.title = field.isVisible ? 'Verbergen' : 'Tonen';
+                visBtn.onclick = () => {
+                  field.isVisible = !field.isVisible;
+                  renderFields();
+                };
+                item.appendChild(visBtn);
+                
+                // Label input
+                const labelInput = document.createElement('input');
+                labelInput.type = 'text';
+                labelInput.value = field.label || '';
+                labelInput.placeholder = 'Veldnaam...';
+                labelInput.className = 'field-label-input';
+                labelInput.oninput = (e) => { field.label = e.target.value; };
+                item.appendChild(labelInput);
+                
+                // Built-in badge
+                if (field.isBuiltIn) {
+                  const badge = document.createElement('span');
+                  badge.className = 'builtin-badge';
+                  badge.textContent = 'Standaard';
+                  item.appendChild(badge);
+                }
+                
+                // Controls
+                const controls = document.createElement('div');
+                controls.className = 'field-controls';
+                
+                const upBtn = document.createElement('button');
+                upBtn.type = 'button';
+                upBtn.className = 'move-btn';
+                upBtn.innerHTML = arrowUpSvg;
+                upBtn.disabled = index === 0;
+                upBtn.onclick = () => {
+                  if (index > 0) {
+                    const temp = sortedFields[index - 1].order;
+                    sortedFields[index - 1].order = field.order;
+                    field.order = temp;
+                    renderFields();
+                  }
+                };
+                controls.appendChild(upBtn);
+                
+                const downBtn = document.createElement('button');
+                downBtn.type = 'button';
+                downBtn.className = 'move-btn';
+                downBtn.innerHTML = arrowDownSvg;
+                downBtn.disabled = index === sortedFields.length - 1;
+                downBtn.onclick = () => {
+                  if (index < sortedFields.length - 1) {
+                    const temp = sortedFields[index + 1].order;
+                    sortedFields[index + 1].order = field.order;
+                    field.order = temp;
+                    renderFields();
+                  }
+                };
+                controls.appendChild(downBtn);
+                
+                // Delete (custom fields only)
+                if (!field.isBuiltIn) {
+                  const delBtn = document.createElement('button');
+                  delBtn.type = 'button';
+                  delBtn.className = 'delete-btn';
+                  delBtn.innerHTML = trashSvg;
+                  delBtn.onclick = () => {
+                    if (confirm('Veld verwijderen? Alle data gaat verloren.')) {
+                      settings.fields = settings.fields.filter(f => f.id !== field.id);
+                      renderFields();
+                    }
+                  };
+                  controls.appendChild(delBtn);
+                }
+                
+                item.appendChild(controls);
+                list.appendChild(item);
+              });
+            }
+            
+            document.getElementById('addFieldBtn').onclick = () => {
+              const maxOrder = Math.max(...settings.fields.map(f => f.order), -1);
+              settings.fields.push({
+                id: 'custom-' + Date.now(),
+                label: '',
+                isBuiltIn: false,
+                isVisible: true,
+                order: maxOrder + 1
+              });
+              renderFields();
+              setTimeout(() => {
+                const inputs = document.querySelectorAll('.field-label-input');
+                if (inputs.length) inputs[inputs.length - 1].focus();
+              }, 50);
+            };
+            
+            document.getElementById('cancelBtn').onclick = () => {
+              parent.postMessage({ pluginMessage: { type: 'cancelSettings' } }, '*');
+            };
+            
+            document.getElementById('saveBtn').onclick = () => {
+              parent.postMessage({ pluginMessage: { type: 'updateSettings', settings: settings } }, '*');
+            };
+            
+            renderFields();
+          </script>
+        </body>
+        </html>`,
+        { width: 380, height: 420, title: 'Profielvelden' }
       )
     })
   }
@@ -1763,6 +2049,7 @@ function UserProfilesWidget() {
             }
           }}
           onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
+          widgetSettings={migratedSettings}
         />
       </AutoLayout>
     </AutoLayout>
