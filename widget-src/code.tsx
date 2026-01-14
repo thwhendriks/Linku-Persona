@@ -204,6 +204,17 @@ const GearIcon = `
 </svg>
 `
 
+const LinkuLogo = `
+<svg width="38" height="12" viewBox="0 0 113 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M104.908 12.1572V29.0473H96.9606V12.1572H89.013V35.9999H104.908C109.297 35.9999 112.856 32.4412 112.856 28.0524V12.1572H104.908Z" fill="#2D6BFB"/>
+<path d="M76.3291 12.1569L72.6497 17.4111L69.1439 22.4181V0L61.1963 2.11936V35.9997H69.1439V26.2624L72.6497 31.2664L75.9641 35.9997H85.6661L77.5007 24.3402L86.0311 12.1569H76.3291Z" fill="#2D6BFB"/>
+<path d="M48.7451 12.1572H32.8499V35.9999H40.7975V19.1128H48.7451V35.9999H56.6927V20.1048C56.6927 15.7159 53.134 12.1572 48.7451 12.1572Z" fill="#2D6BFB"/>
+<path d="M24.3726 8.41856C26.698 8.41856 28.5819 6.53469 28.5819 4.20928C28.5819 1.88387 26.698 0 24.3726 0C22.0472 0 20.1634 1.88387 20.1634 4.20928C20.1634 6.53469 22.0472 8.41856 24.3726 8.41856Z" fill="#2D6BFB"/>
+<path d="M20.3989 12.1572H28.3465V35.9999H20.3989V12.1572Z" fill="#2D6BFB"/>
+<path d="M15.8952 29.044V35.9997H7.94759C3.55875 35.9997 0 32.4409 0 28.0521V2.11936L7.94759 0V29.044H15.8952Z" fill="#2D6BFB"/>
+</svg>
+`
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
@@ -912,6 +923,9 @@ function UserProfilesWidget() {
     fields: DEFAULT_FIELD_CONFIG
   })
 
+  // State: tip visibility
+  const [showTip, setShowTip] = useSyncedState('showTip', true)
+
   // Migration: ensure tasks field exists (for widgets created before tasks was added to fields)
   const migratedSettings = (() => {
     const hasTasksField = widgetSettings.fields.some(f => f.builtInKey === 'tasks')
@@ -1129,7 +1143,7 @@ function UserProfilesWidget() {
             h3 { font-size: 14px; margin-bottom: 16px; color: #1f2937; }
             label { display: block; font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
             input { width: 100%; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
-            input:focus { outline: none; border-color: #EC4899; }
+            input:focus { outline: none; border-color: #2D6BFB; }
             input::placeholder { color: #9ca3af; }
             .icon-section { margin-bottom: 12px; }
             .color-section { margin-bottom: 12px; }
@@ -1160,8 +1174,8 @@ function UserProfilesWidget() {
             }
             .preset-btn.selected { 
               background: #fdf2f8; 
-              border-color: #EC4899; 
-              box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+              border-color: #2D6BFB; 
+              box-shadow: 0 0 0 2px rgba(45, 107, 251, 0.2);
             }
             .color-swatches {
               display: flex;
@@ -1188,8 +1202,8 @@ function UserProfilesWidget() {
               border-color: #d1d5db;
             }
             .swatch.selected {
-              border-color: #EC4899;
-              box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+              border-color: #2D6BFB;
+              box-shadow: 0 0 0 2px rgba(45, 107, 251, 0.2);
             }
             .swatch.selected::after {
               content: '';
@@ -1201,8 +1215,8 @@ function UserProfilesWidget() {
               background-repeat: no-repeat;
               filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
             }
-            .submit-btn { width: 100%; padding: 12px; background: #EC4899; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 4px; }
-            .submit-btn:hover { background: #DB2777; }
+            .submit-btn { width: 100%; padding: 12px; background: #2D6BFB; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 4px; }
+            .submit-btn:hover { background: #1E5BD9; }
           </style>
         </head>
         <body>
@@ -1384,9 +1398,9 @@ function UserProfilesWidget() {
             body { font-family: Inter, -apple-system, sans-serif; padding: 16px; background: #fff; }
             h3 { font-size: 14px; margin-bottom: 16px; color: #1f2937; }
             textarea { width: 100%; height: 200px; padding: 12px; margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; font-family: monospace; resize: none; }
-            textarea:focus { outline: none; border-color: #EC4899; }
-            button { width: 100%; padding: 12px; background: #EC4899; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
-            button:hover { background: #DB2777; }
+            textarea:focus { outline: none; border-color: #2D6BFB; }
+            button { width: 100%; padding: 12px; background: #2D6BFB; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+            button:hover { background: #1E5BD9; }
             .hint { font-size: 11px; color: #9ca3af; margin-bottom: 8px; }
           </style>
         </head>
@@ -1430,9 +1444,9 @@ function UserProfilesWidget() {
             h3 { font-size: 14px; margin-bottom: 16px; color: #1f2937; }
             label { display: block; font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
             select { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
-            select:focus { outline: none; border-color: #EC4899; }
-            button { width: 100%; padding: 12px; background: #EC4899; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
-            button:hover { background: #DB2777; }
+            select:focus { outline: none; border-color: #2D6BFB; }
+            button { width: 100%; padding: 12px; background: #2D6BFB; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+            button:hover { background: #1E5BD9; }
           </style>
         </head>
         <body>
@@ -1471,7 +1485,7 @@ function UserProfilesWidget() {
             h3 { font-size: 16px; margin-bottom: 6px; color: #1f2937; font-weight: 600; }
             .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
             input[type="text"] { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-family: Inter, -apple-system, sans-serif; }
-            input[type="text"]:focus { outline: none; border-color: #EC4899; }
+            input[type="text"]:focus { outline: none; border-color: #2D6BFB; }
             input[type="text"]::placeholder { color: #9ca3af; }
             .field-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
             .field-item { display: flex; gap: 8px; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; transition: border-color 0.15s; }
@@ -1497,8 +1511,8 @@ function UserProfilesWidget() {
             .buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
             .cancel-btn { background: #F3F4F6; color: #374151; }
             .cancel-btn:hover { background: #E5E7EB; }
-            .save-btn { background: #EC4899; color: white; }
-            .save-btn:hover { background: #DB2777; }
+            .save-btn { background: #2D6BFB; color: white; }
+            .save-btn:hover { background: #1E5BD9; }
           </style>
         </head>
         <body>
@@ -1687,8 +1701,8 @@ function UserProfilesWidget() {
           <style>
             body { font-family: Inter, sans-serif; padding: 16px; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
             h3 { font-size: 14px; margin: 0 0 12px 0; font-weight: 600; color: #374151; }
-            button { background: #EC4899; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; margin-top: 8px; }
-            button:hover { background: #DB2777; }
+            button { background: #2D6BFB; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; margin-top: 8px; }
+            button:hover { background: #1E5BD9; }
             p { font-size: 11px; color: #6B7280; margin: 8px 0; line-height: 1.4; }
             textarea { 
               font-family: 'Roboto Mono', monospace; 
@@ -1702,7 +1716,7 @@ function UserProfilesWidget() {
               background: #F9FAFB;
               margin-top: 8px;
             }
-            textarea:focus { outline: none; border-color: #EC4899; }
+            textarea:focus { outline: none; border-color: #2D6BFB; }
             .hidden { display: none; }
             .success { color: #059669; font-weight: 600; }
             .error { color: #DC2626; }
@@ -1964,7 +1978,41 @@ function UserProfilesWidget() {
         )}
       </AutoLayout>
 
-      {/* Divider removed for tighter layout */}
+      {/* Dismissable tip - shown under header when there are profiles */}
+      {(categories.length > 0 || profilesMap.size > 0) && showTip && (
+        <AutoLayout
+          fill="#F0F9FF"
+          stroke="#BAE6FD"
+          strokeWidth={1}
+          cornerRadius={8}
+          padding={{ vertical: 10, horizontal: 12 }}
+          width="fill-parent"
+          spacing={8}
+          verticalAlignItems="center"
+        >
+          <Text fontSize={12} fontFamily="Inter">💡</Text>
+          <Text 
+            fontSize={12} 
+            fill="#0369A1" 
+            fontFamily="Inter"
+            width="fill-parent"
+          >
+            Tip: Pas profielvelden aan via Widget instellingen in het menu.
+          </Text>
+          <AutoLayout
+            width={20}
+            height={20}
+            cornerRadius={4}
+            horizontalAlignItems="center"
+            verticalAlignItems="center"
+            onClick={() => setShowTip(false)}
+            hoverStyle={{ fill: '#E0F2FE' }}
+            tooltip="Tip verbergen"
+          >
+            <SVG src={CloseIcon} />
+          </AutoLayout>
+        </AutoLayout>
+      )}
 
       {/* Empty state - Full width, Profile First */}
       {categories.length === 0 && profilesMap.size === 0 && (
@@ -2005,11 +2053,11 @@ function UserProfilesWidget() {
 
             {/* Primary CTA Button */}
             <AutoLayout
-              fill="#EC4899"
+              fill="#2D6BFB"
               cornerRadius={8}
               padding={{ horizontal: 20, vertical: 12 }}
               onClick={() => addProfile('')}
-              hoverStyle={{ fill: '#DB2777' }}
+              hoverStyle={{ fill: '#1E5BD9' }}
             >
               <Text 
                 fontSize={14} 
@@ -2041,6 +2089,23 @@ function UserProfilesWidget() {
               >
                 💡 Tip: Pas profielvelden aan via Widget instellingen. Voeg eigen velden toe of verberg wat je niet nodig hebt.
               </Text>
+            </AutoLayout>
+
+            {/* Linku branding */}
+            <AutoLayout
+              direction="horizontal"
+              spacing={6}
+              horizontalAlignItems="center"
+              verticalAlignItems="center"
+            >
+              <Text 
+                fontSize={12} 
+                fill="#9CA3AF" 
+                fontFamily="Inter"
+              >
+                Een tool van
+              </Text>
+              <SVG src={LinkuLogo} />
             </AutoLayout>
           </AutoLayout>
         </AutoLayout>
@@ -2118,6 +2183,7 @@ function UserProfilesWidget() {
           />
         </AutoLayout>
       )}
+
     </AutoLayout>
   )
 }
