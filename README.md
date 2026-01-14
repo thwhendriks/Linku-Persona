@@ -2,6 +2,8 @@
 
 Een Figma widget om persona's te maken en beheren.
 
+<img width="1920" height="1080" alt="widget-thumbnail" src="https://github.com/user-attachments/assets/b8f24387-f992-4146-9f91-c2b2e6c6cca7" />
+
 ---
 
 ## 🎯 Voor wie is deze handleiding?
