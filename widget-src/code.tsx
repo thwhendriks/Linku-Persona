@@ -1731,7 +1731,7 @@ function UserProfilesWidget() {
           </div>
 
           <div id="manual-state">
-            <h3>Niet gelukt om te kopiëren</h3>
+            <h3>Exporteer JSON</h3>
             <p>Kopieer de JSON data hieronder handmatig:</p>
             <textarea id="data" readonly></textarea>
             <button id="closeBtn">Sluiten</button>
@@ -2065,7 +2065,7 @@ function UserProfilesWidget() {
                 fill="#FFFFFF" 
                 fontFamily="Inter"
               >
-                + Eerste profiel aanmaken
+                + Eerste profiel toevoegen
               </Text>
             </AutoLayout>
 
