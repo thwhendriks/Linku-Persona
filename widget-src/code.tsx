@@ -1126,7 +1126,7 @@ function UserProfilesWidget() {
           </script>
         </body>
         </html>`,
-        { width: 320, height: 180, title: title }
+        { width: 320, height: 240, title: title }
       )
     })
   }
