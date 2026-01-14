@@ -1,159 +1,163 @@
 # Linku Persona Widget
 
-## Project Overview
-A **FigJam widget** for managing and visualizing user profiles (personas). Built with TypeScript using the Figma Widget API. Supports expand/collapse views, inline editing, categorization, dynamic field configuration, and JSON import/export.
+## Quick Reference
 
-## Tech Stack
-- **Language**: TypeScript
-- **Platform**: Figma/FigJam Widget
-- **Build Tool**: esbuild
-- **Type Definitions**: `@figma/widget-typings`, `@figma/plugin-typings`
+```bash
+npm run build    # Build once → dist/code.js
+npm run watch    # Build and watch
+npm run tsc      # Type check
+npm run lint     # ESLint
+```
 
 ## Project Structure
+
 ```
 widget-src/
-├── code.tsx          # Main widget source (all logic and components)
-├── tsconfig.json     # TypeScript configuration
-dist/
-├── code.js           # Compiled output (loaded by Figma)
-manifest.json         # Figma widget manifest
+├── code.tsx           # Entry point: state, handlers, main render
+├── types.ts           # All TypeScript interfaces
+├── constants.ts       # COLORS, DEFAULT_CATEGORIES, DEFAULT_FIELD_CONFIG
+├── icons.ts           # SVG icon strings (getPlusIcon, CloseIcon, etc.)
+├── strings.ts         # All UI text (i18n-ready)
+├── utils.ts           # Pure helpers (generateId, getFieldValue, etc.)
+├── components/
+│   ├── index.ts       # Barrel export
+│   ├── MiniCard.tsx   # Collapsed profile card
+│   ├── DynamicField.tsx
+│   ├── ExpandedCard.tsx
+│   ├── StatBox.tsx
+│   ├── CategorySection.tsx
+│   ├── DetailPanel.tsx
+│   └── EmptyState.tsx
+└── ui/                # HTML templates for figma.showUI()
+    ├── index.ts
+    ├── categoryForm.ts
+    ├── deleteConfirm.ts
+    ├── importData.ts
+    ├── categoryPicker.ts
+    ├── settings.ts
+    └── exportData.ts
 ```
 
-## Key Commands
-```bash
-npm install           # Install dependencies
-npm run build         # Build once
-npm run watch         # Build and watch for changes
-npm run lint          # Run ESLint
-npm run tsc           # Type check
-```
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `types.ts` | `Profile`, `Category`, `ColorKey`, `WidgetSettings`, `FieldConfig` |
+| `strings.ts` | All user-facing text - edit here for translations |
+| `constants.ts` | Color palette, default field config |
+| `code.tsx` | Widget registration, state management, UI message handlers |
 
 ## Data Model
 
-### Category
 ```typescript
-interface Category {
-  id: string
-  name: string
-  icon: string          // Emoji
-  colorKey: ColorKey    // 'pink' | 'teal' | 'purple' | 'amber' | 'sky' | 'rose' | 'indigo' | 'emerald' | 'gray'
-  order: number
-}
-```
-
-### Profile
-```typescript
+// types.ts
 interface Profile {
   id: string
   name: string
   shortName: string
-  categoryId: string              // Empty string = uncategorized
-  level: 'Basis' | 'Gevorderd' | 'Expert'
-  orgSize: 'S' | 'M' | 'L' | 'XL' | 'Alle' | 'Extern'
+  categoryId: string        // '' = uncategorized
   description: string
   quote: string
   tasks: string[]
   context: string
-  customFields?: Record<string, string>  // fieldId -> value (for custom fields)
+  customFields?: Record<string, string>
 }
-```
 
-### FieldConfig (Dynamic Fields)
-```typescript
+interface Category {
+  id: string
+  name: string
+  icon: string              // Emoji
+  colorKey: ColorKey        // 'pink' | 'teal' | 'purple' | ... | 'gray'
+  order: number
+}
+
 interface FieldConfig {
   id: string
   label: string
-  isBuiltIn: boolean        // true for quote, context, description, tasks
+  isBuiltIn: boolean
   builtInKey?: 'quote' | 'context' | 'description' | 'tasks'
   isVisible: boolean
   order: number
 }
 ```
 
-### WidgetSettings
+## i18n / Translations
+
+All UI strings are centralized in `strings.ts`:
+
 ```typescript
-interface WidgetSettings {
-  fields: FieldConfig[]
+// strings.ts
+export const STRINGS = {
+  defaultTitle: 'Gebruikersprofielen',
+  emptyTitle: 'Al je doelgroepinformatie in één overzicht',
+  categoryAdded: (name: string) => `Categorie "${name}" toegevoegd`,
+  // ... 80+ strings
 }
 ```
 
-## Widget Features
+To add a new language: create `STRINGS_EN`, then switch based on locale.
 
-### Core Features
-- **Categories**: Add, edit, delete categories with emoji presets and color swatches
-- **Profiles**: Create profiles within categories or uncategorized, inline editing of all fields
-- **Detail Panel**: Right-side panel showing expanded profile details
-- **Import/Export**: JSON import and clipboard export functionality
+## Figma Widget Patterns
 
-### Dynamic Field Configuration
-- Built-in fields: Quote, Context, Description, Tasks
-- Custom text fields can be added via Settings
-- Fields can be reordered, renamed, and hidden/shown
-- Task field has special rendering with add/remove functionality
+### Component File Structure
+Each component imports widget primitives directly:
+```typescript
+// components/MiniCard.tsx
+import type { Profile, ColorScheme } from '../types'
+const { AutoLayout, Text } = figma.widget
 
-### UI Components
-- **MiniCard**: Collapsed profile view with number badge and name
-- **ExpandedCard**: Full profile editor with all fields
-- **DynamicField**: Configurable field renderer for both built-in and custom fields
-- **CategorySection**: Category header with profiles list
-- **DetailPanel**: Right-side detail view
+export function MiniCard({ profile, colors, onExpand }: MiniCardProps) { ... }
+```
 
-### Delete Confirmation
-- Profiles and categories show a confirmation dialog before deletion
-- Category deletion shows the number of profiles that will become uncategorized
+### UI Template Pattern
+UI templates return HTML strings with embedded STRINGS:
+```typescript
+// ui/categoryForm.ts
+import { STRINGS } from '../strings'
 
-### Uncategorized Profiles
-- Profiles without a category use the `gray` color scheme
-- Displayed in a separate "Ongecategoriseerd" section
-- Edit/delete buttons are hidden for the uncategorized section header
-
-## Figma Widget Development Notes
+export function getCategoryFormHTML(options: CategoryFormOptions): string {
+  return `<!DOCTYPE html>...<h3>${STRINGS.newCategory}</h3>...`
+}
+export const CATEGORY_FORM_SIZE = { width: 320, height: 520 }
+```
 
 ### State Management
-- Uses `useSyncedState` for simple state (expanded ID, categories, title, widget settings)
-- Uses `useSyncedMap` for profiles (concurrent editing support)
-- Widget settings include field configuration with visibility and ordering
+- `useSyncedState`: categories, title, settings, expandedId
+- `useSyncedMap`: profiles (concurrent editing support)
 
-### UI Actions (Property Menu)
-Actions that open a UI window **must return a `Promise<void>`** to keep the widget active:
+### Property Menu Actions
+Actions that open UI **must return Promise<void>**:
 ```typescript
 case 'exportJson':
   return exportData()  // Returns Promise<void>
 ```
 
 ### Message Passing
-Communication between widget and UI iframe:
-1. Widget opens UI with `figma.showUI(html, options)`
-2. UI sends messages via `window.parent.postMessage({ pluginMessage: {...} }, '*')`
-3. Widget receives in `useEffect` via `figma.ui.onmessage`
-4. Widget sends to UI via `figma.ui.postMessage({ type: '...', data: '...' })`
+1. Widget: `figma.showUI(html, options)`
+2. UI → Widget: `parent.postMessage({ pluginMessage: { type, ... } }, '*')`
+3. Widget: receives in `useEffect` via `figma.ui.onmessage`
+4. Widget → UI: `figma.ui.postMessage({ type, data })`
 
-### Clipboard Access
-Clipboard operations require a **visible** UI window. Pattern:
-1. Open visible UI
-2. UI sends `uiReady` message
-3. Widget sends data via `figma.ui.postMessage`
-4. UI attempts copy with `document.execCommand('copy')` or `navigator.clipboard`
-5. UI sends `exportComplete` on success
-
-### Iterating SyncedMap
-Always use `Array.from()` when iterating a SyncedMap:
+### SyncedMap Iteration
+Always wrap in `Array.from()`:
 ```typescript
 Array.from(profilesMap.entries()).forEach(([key, profile]) => { ... })
 ```
 
-### Dynamic Icon Colors
-Icons that need dynamic colors use a function pattern:
-```typescript
-function getPlusIcon(color: string): string {
-  return `<svg ... stroke="${color}" ...>...</svg>`
-}
-```
-
 ## Color Palette
-All colors use carefully chosen accent, text, and border values for accessibility:
-- **pink, teal, purple, amber, sky, rose, indigo, emerald**: Category colors
-- **gray**: Used for uncategorized profiles
+
+9 color schemes defined in `constants.ts`:
+- **Category colors**: pink, teal, purple, amber, sky, rose, indigo, emerald
+- **Uncategorized**: gray
+
+Each has: `bg`, `bgLight`, `accent`, `text`, `border`
 
 ## Language
-The widget UI is in **Dutch (Nederlands)**.
+
+Widget UI is in **Dutch (Nederlands)**. All text in `strings.ts`.
+
+## Tech Stack
+
+- TypeScript + Figma Widget API
+- esbuild (bundler)
+- `@figma/widget-typings`, `@figma/plugin-typings`
