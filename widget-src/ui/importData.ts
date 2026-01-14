@@ -2,9 +2,15 @@
  * Import Data UI - HTML template for import JSON modal
  */
 
-import { STRINGS } from '../strings'
+import type { Language } from '../types'
+import { getStrings } from '../strings'
 
-export function getImportDataHTML(): string {
+export interface ImportDataOptions {
+  language: Language
+}
+
+export function getImportDataHTML(options: ImportDataOptions): string {
+  const STRINGS = getStrings(options.language)
   return `<!DOCTYPE html>
 <html>
 <head>

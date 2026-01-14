@@ -4,7 +4,7 @@
 
 import type { Profile, Category, ColorScheme, WidgetSettings } from '../types'
 import { CloseIcon, EditIcon } from '../icons'
-import { STRINGS } from '../strings'
+import type { StringsType } from '../strings'
 import { getFieldValue, setFieldValue } from '../utils'
 import { DynamicField } from './DynamicField'
 
@@ -20,6 +20,7 @@ export interface ExpandedCardProps {
   onDelete: () => void
   onEditCategory: () => void
   widgetSettings: WidgetSettings
+  strings: StringsType
 }
 
 export function ExpandedCard({
@@ -32,6 +33,7 @@ export function ExpandedCard({
   onDelete,
   onEditCategory,
   widgetSettings,
+  strings,
 }: ExpandedCardProps) {
   // Sort fields by order, filter visible
   const visibleFields = widgetSettings.fields
@@ -71,11 +73,11 @@ export function ExpandedCard({
             cornerRadius={6}
             fill={colors.bgLight}
             onClick={() => {
-              onUpdate({ ...profile, tasks: [...profile.tasks, STRINGS.newTask] })
+              onUpdate({ ...profile, tasks: [...profile.tasks, strings.newTask] })
             }}
             hoverStyle={{ fill: colors.border }}
           >
-            <Text fontSize={11} fill={colors.text} fontFamily="Inter">{STRINGS.addTask}</Text>
+            <Text fontSize={11} fill={colors.text} fontFamily="Inter">{strings.addTask}</Text>
           </AutoLayout>
         </AutoLayout>
 
@@ -97,7 +99,7 @@ export function ExpandedCard({
                 />
                 <Input
                   value={task}
-                  placeholder={STRINGS.taskPlaceholder}
+                  placeholder={strings.taskPlaceholder}
                   onTextEditEnd={(e) => {
                     const newTasks = [...profile.tasks]
                     if (e.characters.trim() === '') {
@@ -117,7 +119,7 @@ export function ExpandedCard({
           </AutoLayout>
         ) : (
           <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
-            {STRINGS.noTasks}
+            {strings.noTasks}
           </Text>
         )}
       </AutoLayout>
@@ -171,7 +173,7 @@ export function ExpandedCard({
             cornerRadius={6}
             onClick={onEditCategory}
             hoverStyle={{ fill: '#F3F4F6' }}
-            tooltip={STRINGS.changeCategoryTooltip}
+            tooltip={strings.changeCategoryTooltip}
           >
             <Text fontSize={12} fill={colors.text} fontFamily="Inter">
               {category?.icon || '📂'}
@@ -184,13 +186,13 @@ export function ExpandedCard({
               textCase="upper"
               letterSpacing={0.5}
             >
-              {category?.name || STRINGS.noCategory}
+              {category?.name || strings.noCategory}
             </Text>
             <SVG src={EditIcon} />
           </AutoLayout>
           <Input
             value={profile.name}
-            placeholder={STRINGS.profileNamePlaceholder}
+            placeholder={strings.profileNamePlaceholder}
             onTextEditEnd={(e) => onUpdate({ ...profile, name: e.characters })}
             fontSize={18}
             fontWeight={700}
@@ -252,7 +254,7 @@ export function ExpandedCard({
             hoverStyle={{ fill: '#FEE2E2' }}
           >
             <Text fontSize={11} fill="#DC2626" fontFamily="Inter">
-              {STRINGS.deleteProfile}
+              {strings.deleteProfile}
             </Text>
           </AutoLayout>
         </AutoLayout>

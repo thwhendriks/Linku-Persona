@@ -2,15 +2,17 @@
  * Category Form UI - HTML template for add/edit category modal
  */
 
-import type { Category } from '../types'
-import { STRINGS } from '../strings'
+import type { Category, Language } from '../types'
+import { getStrings } from '../strings'
 
 export interface CategoryFormOptions {
   initialData?: Category
+  language: Language
 }
 
-export function getCategoryFormHTML(options: CategoryFormOptions = {}): string {
-  const { initialData } = options
+export function getCategoryFormHTML(options: CategoryFormOptions): string {
+  const { initialData, language } = options
+  const STRINGS = getStrings(language)
   
   // Curated emoji presets organized by domain
   const emojiPresets = [

@@ -3,15 +3,16 @@
  */
 
 import { LinkuLogo } from '../icons'
-import { STRINGS } from '../strings'
+import type { StringsType } from '../strings'
 
 const { AutoLayout, Text, SVG } = figma.widget
 
 export interface EmptyStateProps {
   onAddProfile: () => void
+  strings: StringsType
 }
 
-export function EmptyState({ onAddProfile }: EmptyStateProps) {
+export function EmptyState({ onAddProfile, strings }: EmptyStateProps) {
   return (
     <AutoLayout
       fill="#F9FAFB"
@@ -35,7 +36,7 @@ export function EmptyState({ onAddProfile }: EmptyStateProps) {
           fontFamily="Inter"
           horizontalAlignText="center"
         >
-          {STRINGS.emptyTitle}
+          {strings.emptyTitle}
         </Text>
 
         {/* Subtitle */}
@@ -45,7 +46,7 @@ export function EmptyState({ onAddProfile }: EmptyStateProps) {
           fontFamily="Inter"
           horizontalAlignText="center"
         >
-          {STRINGS.emptySubtitle}
+          {strings.emptySubtitle}
         </Text>
 
         {/* Primary CTA Button */}
@@ -62,7 +63,7 @@ export function EmptyState({ onAddProfile }: EmptyStateProps) {
             fill="#FFFFFF" 
             fontFamily="Inter"
           >
-            {STRINGS.emptyAddFirst}
+            {strings.emptyAddFirst}
           </Text>
         </AutoLayout>
 
@@ -84,7 +85,7 @@ export function EmptyState({ onAddProfile }: EmptyStateProps) {
             horizontalAlignText="center"
             width="fill-parent"
           >
-            {STRINGS.emptyTip}
+            {strings.emptyTip}
           </Text>
         </AutoLayout>
 
@@ -100,7 +101,7 @@ export function EmptyState({ onAddProfile }: EmptyStateProps) {
             fill="#9CA3AF" 
             fontFamily="Inter"
           >
-            {STRINGS.brandingPrefix}
+            {strings.brandingPrefix}
           </Text>
           <SVG src={LinkuLogo} />
         </AutoLayout>

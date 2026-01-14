@@ -2,17 +2,20 @@
  * Delete Confirmation UI - HTML template for delete confirmation modal
  */
 
-import { STRINGS } from '../strings'
+import type { Language } from '../types'
+import { getStrings } from '../strings'
 
 export interface DeleteConfirmOptions {
   type: 'profile' | 'category'
   id: string
   name: string
   profileCount?: number
+  language: Language
 }
 
 export function getDeleteConfirmHTML(options: DeleteConfirmOptions): string {
-  const { type, id, name, profileCount } = options
+  const { type, id, name, profileCount, language } = options
+  const STRINGS = getStrings(language)
   
   const title = type === 'profile' ? STRINGS.deleteProfileTitle : STRINGS.deleteCategoryTitle
   

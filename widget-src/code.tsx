@@ -9,7 +9,7 @@
  */
 
 // Types
-import type { Profile, Category, ColorKey, WidgetSettings, TasksModuleConfig } from './types'
+import type { Profile, Category, ColorKey, WidgetSettings, TasksModuleConfig, Language } from './types'
 
 // Constants
 import { COLORS, DEFAULT_CATEGORIES, DEFAULT_FIELD_CONFIG } from './constants'
@@ -18,7 +18,7 @@ import { COLORS, DEFAULT_CATEGORIES, DEFAULT_FIELD_CONFIG } from './constants'
 import { CloseIcon } from './icons'
 
 // Strings
-import { STRINGS } from './strings'
+import { getStrings } from './strings'
 
 // Utils
 import { generateId, getNextProfileNumber } from './utils'
@@ -63,6 +63,12 @@ function UserProfilesWidget() {
 
   // State: all profiles using SyncedMap for concurrent editing support
   const profilesMap = useSyncedMap<Profile>('profiles')
+
+  // State: language (default English for Community)
+  const [language, setLanguage] = useSyncedState<Language>('language', 'en')
+
+  // Get localized strings
+  const STRINGS = getStrings(language)
 
   // State: categories
   const [categories, setCategories] = useSyncedState<Category[]>('categories', DEFAULT_CATEGORIES)
@@ -151,7 +157,7 @@ function UserProfilesWidget() {
 
   // Handle UI messages
   useEffect(() => {
-    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string; deleteType?: string; settings?: WidgetSettings }) => {
+    figma.ui.onmessage = (msg: { type: string; id?: string; name?: string; icon?: string; color?: string; data?: string; profileId?: string; categoryId?: string; deleteType?: string; settings?: WidgetSettings; language?: string }) => {
       if (msg.type === 'addCategory' && msg.name) {
         const newCategory: Category = {
           id: `cat-${generateId()}`,
@@ -247,8 +253,13 @@ function UserProfilesWidget() {
         figma.closePlugin()
       }
 
-      if (msg.type === 'updateSettings' && msg.settings) {
-        setWidgetSettings(msg.settings)
+      if (msg.type === 'updateSettings') {
+        if (msg.settings) {
+          setWidgetSettings(msg.settings)
+        }
+        if (msg.language) {
+          setLanguage(msg.language as Language)
+        }
         figma.closePlugin()
         figma.notify(STRINGS.settingsSaved)
       }
@@ -265,7 +276,7 @@ function UserProfilesWidget() {
 
   function showCategoryFormUI(initialData?: Category) {
     return new Promise<void>(() => {
-      figma.showUI(getCategoryFormHTML({ initialData }), CATEGORY_FORM_SIZE)
+      figma.showUI(getCategoryFormHTML({ initialData, language }), CATEGORY_FORM_SIZE)
     })
   }
 
@@ -278,7 +289,7 @@ function UserProfilesWidget() {
     const title = type === 'profile' ? STRINGS.deleteProfileTitle : STRINGS.deleteCategoryTitle
     return new Promise<void>(() => {
       figma.showUI(
-        getDeleteConfirmHTML({ type, id, name, profileCount }),
+        getDeleteConfirmHTML({ type, id, name, profileCount, language }),
         { ...DELETE_CONFIRM_SIZE, title }
       )
     })
@@ -286,14 +297,14 @@ function UserProfilesWidget() {
 
   function showImportUI() {
     return new Promise<void>(() => {
-      figma.showUI(getImportDataHTML(), IMPORT_DATA_SIZE)
+      figma.showUI(getImportDataHTML({ language }), IMPORT_DATA_SIZE)
     })
   }
 
   function showCategoryPickerUI(profileId: string, currentCategoryId: string) {
     return new Promise<void>(() => {
       figma.showUI(
-        getCategoryPickerHTML({ profileId, currentCategoryId, categories }),
+        getCategoryPickerHTML({ profileId, currentCategoryId, categories, language }),
         CATEGORY_PICKER_SIZE
       )
     })
@@ -302,7 +313,7 @@ function UserProfilesWidget() {
   function showSettingsUI() {
     return new Promise<void>(() => {
       figma.showUI(
-        getSettingsHTML({ settings: migratedSettings }),
+        getSettingsHTML({ settings: migratedSettings, language }),
         { ...SETTINGS_SIZE, title: STRINGS.settingsTitle }
       )
     })
@@ -342,7 +353,7 @@ function UserProfilesWidget() {
 
     return new Promise<void>(() => {
       figma.notify(STRINGS.exportStarted)
-      figma.showUI(getExportDataHTML(), { ...EXPORT_DATA_SIZE, title: STRINGS.exportTitle })
+      figma.showUI(getExportDataHTML({ language }), { ...EXPORT_DATA_SIZE, title: STRINGS.exportTitle })
     })
   }
 
@@ -554,7 +565,7 @@ function UserProfilesWidget() {
 
       {/* Empty state */}
       {categories.length === 0 && profilesMap.size === 0 && (
-        <EmptyState onAddProfile={() => addProfile('')} />
+        <EmptyState onAddProfile={() => addProfile('')} strings={STRINGS} />
       )}
 
       {/* Main content area: horizontal layout (only when not empty) */}
@@ -585,6 +596,7 @@ function UserProfilesWidget() {
                   onAddProfile={() => addProfile(category.id)}
                   onEditCategory={() => editCategory(category)}
                   onDeleteCategory={() => deleteCategory(category)}
+                  strings={STRINGS}
                 />
               ))}
 
@@ -608,6 +620,7 @@ function UserProfilesWidget() {
                 onAddProfile={() => addProfile('')}
                 onEditCategory={() => {}}
                 onDeleteCategory={() => {}}
+                strings={STRINGS}
               />
             )}
           </AutoLayout>
@@ -626,6 +639,7 @@ function UserProfilesWidget() {
             }}
             onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
             widgetSettings={migratedSettings}
+            strings={STRINGS}
           />
         </AutoLayout>
       )}

@@ -2,17 +2,19 @@
  * Category Picker UI - HTML template for profile category selection modal
  */
 
-import type { Category } from '../types'
-import { STRINGS } from '../strings'
+import type { Category, Language } from '../types'
+import { getStrings } from '../strings'
 
 export interface CategoryPickerOptions {
   profileId: string
   currentCategoryId: string
   categories: Category[]
+  language: Language
 }
 
 export function getCategoryPickerHTML(options: CategoryPickerOptions): string {
-  const { profileId, currentCategoryId, categories } = options
+  const { profileId, currentCategoryId, categories, language } = options
+  const STRINGS = getStrings(language)
   
   const categoryOptions = [
     `<option value="" ${currentCategoryId === '' ? 'selected' : ''}>${STRINGS.noCategory}</option>`,

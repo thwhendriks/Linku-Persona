@@ -2,16 +2,19 @@
  * Settings UI - HTML template for widget field settings modal
  */
 
-import type { WidgetSettings } from '../types'
-import { STRINGS } from '../strings'
+import type { WidgetSettings, Language } from '../types'
+import { getStrings } from '../strings'
 
 export interface SettingsOptions {
   settings: WidgetSettings
+  language: Language
 }
 
 export function getSettingsHTML(options: SettingsOptions): string {
-  const { settings } = options
+  const { settings, language } = options
+  const STRINGS = getStrings(language)
   const settingsJson = JSON.stringify(settings).replace(/'/g, "\\'")
+  const currentLanguage = language
 
   return `<!DOCTYPE html>
 <html>
@@ -50,9 +53,24 @@ export function getSettingsHTML(options: SettingsOptions): string {
     .cancel-btn:hover { background: #E5E7EB; }
     .save-btn { background: #2D6BFB; color: white; }
     .save-btn:hover { background: #1E5BD9; }
+    .section-divider { height: 1px; background: #e5e7eb; margin: 16px 0; }
+    .language-section { margin-bottom: 16px; }
+    .language-label { font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .language-select { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: Inter, -apple-system, sans-serif; background: #fff; cursor: pointer; }
+    .language-select:focus { outline: none; border-color: #2D6BFB; }
   </style>
 </head>
 <body>
+  <div class="language-section">
+    <label class="language-label">${STRINGS.languageLabel}</label>
+    <select id="languageSelect" class="language-select">
+      <option value="en" ${currentLanguage === 'en' ? 'selected' : ''}>${STRINGS.languageEnglish}</option>
+      <option value="nl" ${currentLanguage === 'nl' ? 'selected' : ''}>${STRINGS.languageDutch}</option>
+    </select>
+  </div>
+  
+  <div class="section-divider"></div>
+  
   <h3>${STRINGS.settingsTitle}</h3>
   <p class="subtitle">${STRINGS.settingsSubtitle}</p>
   
@@ -189,7 +207,8 @@ export function getSettingsHTML(options: SettingsOptions): string {
     };
     
     document.getElementById('saveBtn').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'updateSettings', settings: settings } }, '*');
+      const language = document.getElementById('languageSelect').value;
+      parent.postMessage({ pluginMessage: { type: 'updateSettings', settings: settings, language: language } }, '*');
     };
     
     renderFields();
@@ -198,4 +217,4 @@ export function getSettingsHTML(options: SettingsOptions): string {
 </html>`
 }
 
-export const SETTINGS_SIZE = { width: 380, height: 420 }
+export const SETTINGS_SIZE = { width: 380, height: 500 }

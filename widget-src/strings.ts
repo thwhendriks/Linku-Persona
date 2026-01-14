@@ -1,12 +1,132 @@
 /**
  * UI Strings for Linku Persona Widget
  * 
- * All user-facing text is centralized here for easy i18n integration.
- * To add multi-language support, replace this with a function that
- * returns the appropriate strings based on locale.
+ * All user-facing text is centralized here for i18n support.
+ * English is the default language, Dutch is available via settings.
  */
 
-export const STRINGS = {
+import type { Language } from './types'
+
+// English strings (default)
+const STRINGS_EN = {
+  // Widget Header
+  defaultTitle: 'User Profiles',
+  profileCount: (n: number) => `${n} profile${n !== 1 ? 's' : ''}`,
+  categoryCount: (n: number) => `${n} ${n !== 1 ? 'categories' : 'category'}`,
+  
+  // Empty State
+  emptyTitle: 'All your audience insights in one place',
+  emptySubtitle: 'Create profiles, group them in categories, and share with your team.',
+  emptyAddFirst: '+ Add first profile',
+  emptyTip: '💡 Tip: Customize profile fields via Widget settings. Add custom fields or hide what you don\'t need.',
+  brandingPrefix: 'A tool by',
+  
+  // Tip Banner
+  tipMessage: 'Tip: Customize profile fields via Widget settings in the menu.',
+  tipHide: 'Hide tip',
+  
+  // Categories
+  uncategorized: 'Uncategorized',
+  noProfilesInCategory: 'No profiles in this category yet',
+  newCategory: 'New category',
+  editCategory: 'Edit category',
+  categoryEdit: 'Edit',
+  categoryDelete: 'Delete',
+  newProfileTooltip: 'New profile',
+  changeCategoryTooltip: 'Change category',
+  
+  // Category Form
+  categoryFormName: 'Name',
+  categoryFormNamePlaceholder: 'E.g. Healthcare professionals',
+  categoryFormIcon: 'Icon',
+  categoryFormColor: 'Color',
+  
+  // Profiles
+  newProfile: 'New profile',
+  newProfileShort: 'New',
+  profileNamePlaceholder: 'Profile name...',
+  deleteProfile: 'Delete profile',
+  noCategory: 'No category',
+  
+  // Tasks
+  noTasks: 'No tasks added yet',
+  addTask: '+ Task',
+  taskPlaceholder: 'Task...',
+  newTask: 'New task',
+  
+  // Detail Panel
+  detailPanelEmpty: 'Click a profile to\nview details',
+  
+  // Actions
+  save: 'Save',
+  cancel: 'Cancel',
+  delete: 'Delete',
+  add: 'Add',
+  close: 'Close',
+  
+  // Settings
+  settingsTitle: 'Profile Fields',
+  settingsSubtitle: 'Choose which fields are visible and in what order',
+  addField: '+ Add new field',
+  fieldNamePlaceholder: 'Field name...',
+  builtInBadge: 'Default',
+  showField: 'Show',
+  hideField: 'Hide',
+  deleteFieldConfirm: 'Delete field? All data will be lost.',
+  
+  // Delete Confirmation
+  deleteProfileTitle: 'Delete Profile',
+  deleteCategoryTitle: 'Delete Category',
+  deleteProfileMessage: (name: string) => `Are you sure you want to delete "${name}"?`,
+  deleteCategoryMessage: (name: string) => `Are you sure you want to delete category "${name}"?`,
+  deleteCategoryWithProfiles: (name: string, count: number) => 
+    `Are you sure you want to delete category "${name}"?<br><br><strong>${count} profile${count > 1 ? 's' : ''} will be moved to "Uncategorized".</strong>`,
+  
+  // Import/Export
+  importTitle: 'Import JSON',
+  importHint: 'Paste the exported JSON data here',
+  importButton: 'Import',
+  importPlaceholder: '{"widgetTitle": "...", "widgetSettings": {...}, "categories": [...], "profiles": {...}}',
+  exportTitle: 'Export JSON',
+  exportLoading: 'Loading...',
+  exportCopying: 'Copying...',
+  exportCopied: 'Copied!',
+  exportManualHint: 'Copy the JSON data below manually:',
+  
+  // Category Picker
+  categoryPickerTitle: 'Select category',
+  categoryPickerLabel: 'Category',
+  
+  // Property Menu Tooltips
+  menuSettings: 'Widget settings',
+  menuAddProfile: 'Add profile',
+  menuAddCategory: 'Add category',
+  menuExport: 'Export JSON',
+  menuImport: 'Import JSON',
+  
+  // Notifications
+  categoryAdded: (name: string) => `Category "${name}" added`,
+  categoryUpdated: (name: string) => `Category "${name}" updated`,
+  categoryDeleted: (name: string) => `Category "${name}" deleted`,
+  categoryDeletedWithProfiles: (name: string, count: number) => 
+    `Category "${name}" deleted. ${count} profile${count > 1 ? 's' : ''} moved.`,
+  profileDeleted: 'Profile deleted',
+  categoryUpdatedNotify: 'Category updated',
+  settingsSaved: 'Settings saved',
+  importSuccess: 'Data imported successfully',
+  importError: 'Import error: invalid JSON format',
+  exportStarted: 'Export started...',
+  exportCopiedNotify: 'Data copied to clipboard',
+  exportError: 'Error copying to clipboard',
+
+  // Language Settings
+  languageLabel: 'Language',
+  languageEnglish: 'English',
+  languageDutch: 'Nederlands',
+}
+
+// Dutch strings
+const STRINGS_NL: typeof STRINGS_EN = {
   // Widget Header
   defaultTitle: 'Gebruikersprofielen',
   profileCount: (n: number) => `${n} profiel${n !== 1 ? 'en' : ''}`,
@@ -116,4 +236,21 @@ export const STRINGS = {
   exportStarted: 'Export gestart...',
   exportCopiedNotify: 'Data gekopieerd naar klembord',
   exportError: 'Fout bij kopiëren naar klembord',
+
+  // Language Settings
+  languageLabel: 'Taal',
+  languageEnglish: 'English',
+  languageDutch: 'Nederlands',
 }
+
+// Type for strings object
+export type StringsType = typeof STRINGS_EN
+
+// Get strings for a specific language
+export function getStrings(language: Language): StringsType {
+  return language === 'nl' ? STRINGS_NL : STRINGS_EN
+}
+
+// Legacy export for backwards compatibility during migration
+// Components should use getStrings(language) instead
+export const STRINGS = STRINGS_EN

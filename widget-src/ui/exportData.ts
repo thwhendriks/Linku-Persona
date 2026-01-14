@@ -2,9 +2,15 @@
  * Export Data UI - HTML template for export JSON modal
  */
 
-import { STRINGS } from '../strings'
+import type { Language } from '../types'
+import { getStrings } from '../strings'
 
-export function getExportDataHTML(): string {
+export interface ExportDataOptions {
+  language: Language
+}
+
+export function getExportDataHTML(options: ExportDataOptions): string {
+  const STRINGS = getStrings(options.language)
   return `<!DOCTYPE html>
 <html>
   <head>

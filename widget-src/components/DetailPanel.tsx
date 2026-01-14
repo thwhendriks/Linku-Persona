@@ -4,7 +4,7 @@
 
 import type { Profile, Category, WidgetSettings } from '../types'
 import { COLORS } from '../constants'
-import { STRINGS } from '../strings'
+import type { StringsType } from '../strings'
 import { ExpandedCard } from './ExpandedCard'
 
 const { AutoLayout, Text } = figma.widget
@@ -18,6 +18,7 @@ export interface DetailPanelProps {
   onDelete: () => void
   onEditCategory: () => void
   widgetSettings: WidgetSettings
+  strings: StringsType
 }
 
 export function DetailPanel({
@@ -29,6 +30,7 @@ export function DetailPanel({
   onDelete,
   onEditCategory,
   widgetSettings,
+  strings,
 }: DetailPanelProps) {
   if (!expandedProfile) {
     return (
@@ -42,7 +44,7 @@ export function DetailPanel({
         cornerRadius={12}
       >
         <Text fontSize={13} fill="#6B7280" fontFamily="Inter">
-          {STRINGS.detailPanelEmpty}
+          {strings.detailPanelEmpty}
         </Text>
       </AutoLayout>
     )
@@ -66,6 +68,7 @@ export function DetailPanel({
         onDelete={onDelete}
         onEditCategory={onEditCategory}
         widgetSettings={widgetSettings}
+        strings={strings}
       />
     </AutoLayout>
   )

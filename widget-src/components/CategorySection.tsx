@@ -5,7 +5,7 @@
 import type { Profile, Category, ColorScheme } from '../types'
 import { COLORS } from '../constants'
 import { getPlusIcon, EditIcon, TrashIcon } from '../icons'
-import { STRINGS } from '../strings'
+import type { StringsType } from '../strings'
 import { MiniCard } from './MiniCard'
 
 const { AutoLayout, Text, SVG } = figma.widget
@@ -26,6 +26,7 @@ export interface CategorySectionProps {
   onAddProfile: () => void
   onEditCategory: () => void | Promise<void>
   onDeleteCategory: () => void
+  strings: StringsType
 }
 
 export function CategorySection({
@@ -39,6 +40,7 @@ export function CategorySection({
   onAddProfile,
   onEditCategory,
   onDeleteCategory,
+  strings,
 }: CategorySectionProps) {
   const colors: ColorScheme = COLORS[category.colorKey] || COLORS.pink
 
@@ -114,7 +116,7 @@ export function CategorySection({
                   cornerRadius={6}
                   onClick={onEditCategory}
                   hoverStyle={{ fill: '#F3F4F6' }}
-                  tooltip={STRINGS.categoryEdit}
+                  tooltip={strings.categoryEdit}
                 >
                   <SVG src={EditIcon} />
                 </AutoLayout>
@@ -123,7 +125,7 @@ export function CategorySection({
                   cornerRadius={6}
                   onClick={onDeleteCategory}
                   hoverStyle={{ fill: '#FEE2E2' }}
-                  tooltip={STRINGS.categoryDelete}
+                  tooltip={strings.categoryDelete}
                 >
                   <SVG src={TrashIcon} />
                 </AutoLayout>
@@ -142,7 +144,7 @@ export function CategorySection({
               verticalAlignItems="center"
               onClick={onAddProfile}
               hoverStyle={{ fill: '#F9FAFB' }}
-              tooltip={STRINGS.newProfileTooltip}
+              tooltip={strings.newProfileTooltip}
             >
               <SVG src={getPlusIcon(colors.accent)} />
             </AutoLayout>
@@ -180,7 +182,7 @@ export function CategorySection({
           width="fill-parent"
         >
           <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
-            {STRINGS.noProfilesInCategory}
+            {strings.noProfilesInCategory}
           </Text>
         </AutoLayout>
       )}

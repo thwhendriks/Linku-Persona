@@ -24,6 +24,9 @@ export interface Category {
 
 export type ColorKey = 'pink' | 'teal' | 'purple' | 'amber' | 'sky' | 'rose' | 'indigo' | 'emerald' | 'gray'
 
+// Language options for i18n
+export type Language = 'en' | 'nl'
+
 export interface ColorScheme {
   bg: string
   bgLight: string
