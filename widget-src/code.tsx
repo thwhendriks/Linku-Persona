@@ -203,6 +203,7 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
       onClick={onExpand}
       hoverStyle={{ fill: colors.bgLight }}
       width="fill-parent"
+      verticalAlignItems="center"
     >
       {/* Number badge */}
       <AutoLayout
@@ -224,23 +225,15 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
       </AutoLayout>
 
       {/* Profile info */}
-      <AutoLayout direction="vertical" spacing={2} width="fill-parent">
-        <Text
-          fontSize={13}
-          fontWeight={600}
-          fill="#1F2937"
-          fontFamily="Inter"
-        >
-          {profile.shortName || profile.name}
-        </Text>
-        <Text
-          fontSize={11}
-          fill="#6B7280"
-          fontFamily="Inter"
-        >
-          {profile.level} · {profile.orgSize}
-        </Text>
-      </AutoLayout>
+      <Text
+        fontSize={13}
+        fontWeight={600}
+        fill="#1F2937"
+        fontFamily="Inter"
+        width="fill-parent"
+      >
+        {profile.shortName || profile.name}
+      </Text>
     </AutoLayout>
   )
 }
