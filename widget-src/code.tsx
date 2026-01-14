@@ -758,7 +758,7 @@ function CategorySection({
           direction="vertical"
           spacing={8}
           width="fill-parent"
-          padding={12}
+          padding={{ top: 0, bottom: 12, left: 12, right: 12 }}
         >
           {profiles.map((profile) => {
             const profileNumber = getProfileNumber(profile)
