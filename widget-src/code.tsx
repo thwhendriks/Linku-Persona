@@ -66,64 +66,64 @@ const COLORS: Record<ColorKey, ColorScheme> = {
   pink: {
     bg: '#FDF2F8',
     bgLight: '#FDF2F8',
-    accent: '#EC4899',
-    text: '#BE185D',
+    accent: '#DB2777',
+    text: '#9D174D',
     border: '#F9A8D4',
   },
   teal: {
     bg: '#F0FDFA',
     bgLight: '#F0FDFA',
-    accent: '#14B8A6',
-    text: '#0F766E',
+    accent: '#0D9488',
+    text: '#115E59',
     border: '#5EEAD4',
   },
   purple: {
     bg: '#FAF5FF',
     bgLight: '#FAF5FF',
-    accent: '#A855F7',
-    text: '#7E22CE',
+    accent: '#7C3AED',
+    text: '#6B21A8',
     border: '#D8B4FE',
   },
   amber: {
     bg: '#FFFBEB',
     bgLight: '#FFFBEB',
-    accent: '#F59E0B',
-    text: '#B45309',
+    accent: '#B45309',
+    text: '#92400E',
     border: '#FCD34D',
   },
   sky: {
     bg: '#F0F9FF',
     bgLight: '#F0F9FF',
-    accent: '#0EA5E9',
-    text: '#0369A1',
+    accent: '#0284C7',
+    text: '#075985',
     border: '#7DD3FC',
   },
   rose: {
     bg: '#FFF1F2',
     bgLight: '#FFF1F2',
-    accent: '#F43F5E',
-    text: '#BE123C',
+    accent: '#E11D48',
+    text: '#9F1239',
     border: '#FDA4AF',
   },
   indigo: {
     bg: '#EEF2FF',
     bgLight: '#EEF2FF',
-    accent: '#6366F1',
-    text: '#4338CA',
+    accent: '#4F46E5',
+    text: '#3730A3',
     border: '#A5B4FC',
   },
   emerald: {
     bg: '#ECFDF5',
     bgLight: '#ECFDF5',
-    accent: '#10B981',
-    text: '#047857',
+    accent: '#059669',
+    text: '#065F46',
     border: '#6EE7B7',
   },
   gray: {
     bg: '#F9FAFB',
     bgLight: '#F9FAFB',
-    accent: '#6B7280',
-    text: '#374151',
+    accent: '#4B5563',
+    text: '#1F2937',
     border: '#D1D5DB',
   },
 }
@@ -143,14 +143,14 @@ function getPlusIcon(color: string): string {
 }
 
 const CloseIcon = `
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
   <path d="M18 6L6 18M6 6l12 12"/>
 </svg>
 `
 
 
 const EditIcon = `
-<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
 </svg>
@@ -235,7 +235,7 @@ function MiniCard({ profile, number, colors, onExpand, isSelected = false }: Min
         </Text>
         <Text
           fontSize={11}
-          fill="#9CA3AF"
+          fill="#6B7280"
           fontFamily="Inter"
         >
           {profile.level} · {profile.orgSize}
@@ -403,7 +403,7 @@ function ExpandedCard({
           <Text
             fontSize={10}
             fontWeight={600}
-            fill="#9CA3AF"
+            fill="#6B7280"
             fontFamily="Inter"
             textCase="upper"
             letterSpacing={0.5}
@@ -437,7 +437,7 @@ function ExpandedCard({
           <Text
             fontSize={10}
             fontWeight={600}
-            fill="#9CA3AF"
+            fill="#6B7280"
             fontFamily="Inter"
             textCase="upper"
             letterSpacing={0.5}
@@ -478,7 +478,7 @@ function ExpandedCard({
             <Text
               fontSize={10}
               fontWeight={600}
-              fill="#9CA3AF"
+              fill="#6B7280"
               fontFamily="Inter"
               textCase="upper"
               letterSpacing={0.5}
@@ -536,7 +536,7 @@ function ExpandedCard({
               ))}
             </AutoLayout>
           ) : (
-            <Text fontSize={12} fill="#9CA3AF" fontFamily="Inter">
+            <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
               Nog geen taken toegevoegd
             </Text>
           )}
@@ -604,7 +604,7 @@ function StatBox({ label, value, colors, editable = false, onEdit }: StatBoxProp
         {value}
       </Text>
       <AutoLayout direction="horizontal" spacing={2} verticalAlignItems="center">
-        <Text fontSize={10} fill="#9CA3AF" fontFamily="Inter">
+        <Text fontSize={10} fill="#6B7280" fontFamily="Inter">
           {label}
         </Text>
         {editable && <SVG src={EditIcon} />}
@@ -781,7 +781,7 @@ function CategorySection({
           horizontalAlignItems="center"
           width="fill-parent"
         >
-          <Text fontSize={12} fill="#9CA3AF" fontFamily="Inter">
+          <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
             Nog geen profielen in deze categorie
           </Text>
         </AutoLayout>
@@ -824,7 +824,7 @@ function DetailPanel({
         fill="#F9FAFB"
         cornerRadius={12}
       >
-        <Text fontSize={13} fill="#9CA3AF" fontFamily="Inter">
+        <Text fontSize={13} fill="#6B7280" fontFamily="Inter">
           Klik op een profiel om{'\n'}details te bekijken
         </Text>
       </AutoLayout>
@@ -1486,7 +1486,7 @@ function UserProfilesWidget() {
             fontFamily="Inter"
             width="fill-parent"
           />
-          <Text fontSize={12} fill="#9CA3AF" fontFamily="Inter">
+          <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
             {totalProfiles} profiel{totalProfiles !== 1 ? 'en' : ''} · {categories.length} categorie{categories.length !== 1 ? 'ën' : ''}
           </Text>
         </AutoLayout>
@@ -1593,7 +1593,7 @@ function UserProfilesWidget() {
               horizontalAlignItems="center"
               width="fill-parent"
             >
-              <Text fontSize={14} fill="#9CA3AF" fontFamily="Inter">
+              <Text fontSize={14} fill="#6B7280" fontFamily="Inter">
                 Nog geen categorieën
               </Text>
               <Text fontSize={12} fill="#D1D5DB" fontFamily="Inter">
