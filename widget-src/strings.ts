@@ -123,6 +123,12 @@ const STRINGS_EN = {
   languageLabel: 'Language',
   languageEnglish: 'English',
   languageDutch: 'Nederlands',
+
+  // Built-in Field Labels
+  fieldQuote: 'Quote',
+  fieldContext: 'Context',
+  fieldDescription: 'Description',
+  fieldTasks: 'Tasks',
 }
 
 // Dutch strings
@@ -241,6 +247,12 @@ const STRINGS_NL: typeof STRINGS_EN = {
   languageLabel: 'Taal',
   languageEnglish: 'English',
   languageDutch: 'Nederlands',
+
+  // Built-in Field Labels
+  fieldQuote: 'Quote',
+  fieldContext: 'Context',
+  fieldDescription: 'Beschrijving',
+  fieldTasks: 'Taken',
 }
 
 // Type for strings object
@@ -249,6 +261,23 @@ export type StringsType = typeof STRINGS_EN
 // Get strings for a specific language
 export function getStrings(language: Language): StringsType {
   return language === 'nl' ? STRINGS_NL : STRINGS_EN
+}
+
+// Get the translated label for a field
+// Built-in fields use translated labels, custom fields use their stored label
+export function getFieldLabel(
+  field: { isBuiltIn: boolean; builtInKey?: string; label: string },
+  strings: StringsType
+): string {
+  if (field.isBuiltIn && field.builtInKey) {
+    switch (field.builtInKey) {
+      case 'quote': return strings.fieldQuote
+      case 'context': return strings.fieldContext
+      case 'description': return strings.fieldDescription
+      case 'tasks': return strings.fieldTasks
+    }
+  }
+  return field.label
 }
 
 // Legacy export for backwards compatibility during migration

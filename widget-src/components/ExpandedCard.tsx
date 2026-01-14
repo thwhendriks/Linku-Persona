@@ -4,6 +4,7 @@
 
 import type { Profile, Category, ColorScheme, WidgetSettings } from '../types'
 import { CloseIcon, EditIcon } from '../icons'
+import { getFieldLabel } from '../strings'
 import type { StringsType } from '../strings'
 import { getFieldValue, setFieldValue } from '../utils'
 import { DynamicField } from './DynamicField'
@@ -65,7 +66,7 @@ export function ExpandedCard({
             textCase="upper"
             letterSpacing={0.5}
           >
-            {fieldConfig.label} ({profile.tasks.length})
+            {getFieldLabel(fieldConfig, strings)} ({profile.tasks.length})
           </Text>
           <AutoLayout width="fill-parent" height={1} />
           <AutoLayout
@@ -232,6 +233,7 @@ export function ExpandedCard({
               const updatedProfile = setFieldValue(profile, fieldConfig, value)
               onUpdate(updatedProfile)
             }}
+            strings={strings}
           />
         )
       })}

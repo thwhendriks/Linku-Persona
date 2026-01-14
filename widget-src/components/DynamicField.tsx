@@ -3,6 +3,8 @@
  */
 
 import type { FieldConfig } from '../types'
+import { getFieldLabel } from '../strings'
+import type { StringsType } from '../strings'
 
 const { AutoLayout, Text, Input } = figma.widget
 
@@ -10,9 +12,12 @@ export interface DynamicFieldProps {
   config: FieldConfig
   value: string
   onChange: (value: string) => void
+  strings: StringsType
 }
 
-export function DynamicField({ config, value, onChange }: DynamicFieldProps) {
+export function DynamicField({ config, value, onChange, strings }: DynamicFieldProps) {
+  const label = getFieldLabel(config, strings)
+  
   return (
     <AutoLayout width="fill-parent">
       <AutoLayout
@@ -31,11 +36,11 @@ export function DynamicField({ config, value, onChange }: DynamicFieldProps) {
           textCase="upper"
           letterSpacing={0.5}
         >
-          {config.label}
+          {label}
         </Text>
         <Input
           value={value}
-          placeholder={`${config.label}...`}
+          placeholder={`${label}...`}
           onTextEditEnd={(e) => onChange(e.characters)}
           fontSize={13}
           fill="#1F2937"
