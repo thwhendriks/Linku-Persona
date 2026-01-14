@@ -1072,12 +1072,21 @@ function UserProfilesWidget() {
   function showDeleteConfirmationUI(
     type: 'profile' | 'category',
     id: string,
-    name: string
+    name: string,
+    profileCount?: number
   ) {
     const title = type === 'profile' ? 'Profiel verwijderen' : 'Categorie verwijderen'
-    const message = type === 'profile' 
-      ? `Weet je zeker dat je "${name}" wilt verwijderen?`
-      : `Weet je zeker dat je categorie "${name}" wilt verwijderen?`
+    let message = ''
+    
+    if (type === 'profile') {
+      message = `Weet je zeker dat je "${name}" wilt verwijderen?`
+    } else {
+      if (profileCount && profileCount > 0) {
+        message = `Weet je zeker dat je categorie "${name}" wilt verwijderen?<br><br><strong>${profileCount} profiel${profileCount > 1 ? 'en' : ''} ${profileCount > 1 ? 'worden' : 'wordt'} automatisch verplaatst naar "Ongecategoriseerd".</strong>`
+      } else {
+        message = `Weet je zeker dat je categorie "${name}" wilt verwijderen?`
+      }
+    }
     
     return new Promise<void>(() => {
       figma.showUI(
@@ -1398,19 +1407,26 @@ function UserProfilesWidget() {
   // Helper: Delete category (with confirmation)
   function deleteCategory(category: Category) {
     const profiles = getProfilesForCategory(category.id)
-    if (profiles.length > 0) {
-      figma.notify('Kan categorie niet verwijderen: bevat nog profielen', { error: true })
-      return
-    }
-
-    return showDeleteConfirmationUI('category', category.id, category.name)
+    return showDeleteConfirmationUI('category', category.id, category.name, profiles.length)
   }
 
   // Helper: Actually delete category (called after confirmation)
   function actualDeleteCategory(category: Category) {
+    // Verplaats profielen naar ongecategoriseerd
+    const profiles = getProfilesForCategory(category.id)
+    profiles.forEach(profile => {
+      profilesMap.set(profile.id, { ...profile, categoryId: '' })
+    })
+    
+    // Verwijder de categorie
     const newCategories = categories.filter(c => c.id !== category.id)
     setCategories(newCategories)
-    figma.notify(`Categorie "${category.name}" verwijderd`)
+    
+    // Toon passende melding
+    const message = profiles.length > 0
+      ? `Categorie "${category.name}" verwijderd. ${profiles.length} profiel${profiles.length > 1 ? 'en' : ''} verplaatst.`
+      : `Categorie "${category.name}" verwijderd`
+    figma.notify(message)
   }
 
   // Auto-select first profile on initial load ONLY if none is selected
