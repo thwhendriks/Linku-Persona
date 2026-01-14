@@ -23,7 +23,6 @@ const STRINGS_EN = {
   
   // Tip Banner
   tipMessage: 'Tip: Customize profile fields via Widget settings in the menu.',
-  tipHide: 'Hide tip',
   
   // Categories
   uncategorized: 'Uncategorized',
@@ -32,8 +31,6 @@ const STRINGS_EN = {
   editCategory: 'Edit category',
   categoryEdit: 'Edit',
   categoryDelete: 'Delete',
-  newProfileTooltip: 'New profile',
-  changeCategoryTooltip: 'Change category',
   
   // Category Form
   categoryFormName: 'Name',
@@ -97,7 +94,7 @@ const STRINGS_EN = {
   categoryPickerTitle: 'Select category',
   categoryPickerLabel: 'Category',
   
-  // Property Menu Tooltips
+  // Property Menu
   menuSettings: 'Widget settings',
   menuAddProfile: 'Add profile',
   menuAddCategory: 'Add category',
@@ -147,7 +144,6 @@ const STRINGS_NL: typeof STRINGS_EN = {
   
   // Tip Banner
   tipMessage: 'Tip: Pas profielvelden aan via Widget instellingen in het menu.',
-  tipHide: 'Tip verbergen',
   
   // Categories
   uncategorized: 'Ongecategoriseerd',
@@ -156,8 +152,6 @@ const STRINGS_NL: typeof STRINGS_EN = {
   editCategory: 'Categorie bewerken',
   categoryEdit: 'Bewerken',
   categoryDelete: 'Verwijderen',
-  newProfileTooltip: 'Nieuw profiel',
-  changeCategoryTooltip: 'Categorie wijzigen',
   
   // Category Form
   categoryFormName: 'Naam',
@@ -221,7 +215,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   categoryPickerTitle: 'Selecteer categorie',
   categoryPickerLabel: 'Categorie',
   
-  // Property Menu Tooltips
+  // Property Menu
   menuSettings: 'Widget instellingen',
   menuAddProfile: 'Profiel toevoegen',
   menuAddCategory: 'Categorie toevoegen',

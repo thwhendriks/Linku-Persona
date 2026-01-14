@@ -499,7 +499,6 @@ function UserProfilesWidget() {
                 fill={COLORS[cat.colorKey]?.accent || COLORS.pink.accent}
                 horizontalAlignItems="center"
                 verticalAlignItems="center"
-                tooltip={cat.name}
               >
                 <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
                   {getProfilesForCategory(cat.id).length}
@@ -516,7 +515,6 @@ function UserProfilesWidget() {
                 fill={COLORS.gray.accent}
                 horizontalAlignItems="center"
                 verticalAlignItems="center"
-                tooltip={STRINGS.uncategorized}
               >
                 <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
                   {getProfilesForCategory('').length}
@@ -556,7 +554,6 @@ function UserProfilesWidget() {
             verticalAlignItems="center"
             onClick={() => setShowTip(false)}
             hoverStyle={{ fill: '#E0F2FE' }}
-            tooltip={STRINGS.tipHide}
           >
             <SVG src={CloseIcon} />
           </AutoLayout>

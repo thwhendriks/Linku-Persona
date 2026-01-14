@@ -174,7 +174,6 @@ export function ExpandedCard({
             cornerRadius={6}
             onClick={onEditCategory}
             hoverStyle={{ fill: '#F3F4F6' }}
-            tooltip={strings.changeCategoryTooltip}
           >
             <Text fontSize={12} fill={colors.text} fontFamily="Inter">
               {category?.icon || '📂'}

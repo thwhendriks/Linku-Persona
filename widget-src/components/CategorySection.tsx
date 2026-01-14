@@ -116,7 +116,6 @@ export function CategorySection({
                   cornerRadius={6}
                   onClick={onEditCategory}
                   hoverStyle={{ fill: '#F3F4F6' }}
-                  tooltip={strings.categoryEdit}
                 >
                   <SVG src={EditIcon} />
                 </AutoLayout>
@@ -125,7 +124,6 @@ export function CategorySection({
                   cornerRadius={6}
                   onClick={onDeleteCategory}
                   hoverStyle={{ fill: '#FEE2E2' }}
-                  tooltip={strings.categoryDelete}
                 >
                   <SVG src={TrashIcon} />
                 </AutoLayout>
@@ -144,7 +142,6 @@ export function CategorySection({
               verticalAlignItems="center"
               onClick={onAddProfile}
               hoverStyle={{ fill: '#F9FAFB' }}
-              tooltip={strings.newProfileTooltip}
             >
               <SVG src={getPlusIcon(colors.accent)} />
             </AutoLayout>
