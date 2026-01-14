@@ -16,9 +16,9 @@ const STRINGS_EN = {
   
   // Empty State
   emptyTitle: 'All your audience insights in one place',
-  emptySubtitle: 'Create profiles, group them in categories, and share with your team.',
+  emptySubtitle: 'Create profiles, group them into categories, and share with your team.',
   emptyAddFirst: '+ Add first profile',
-  emptyTip: '💡 Tip: Customize profile fields via Widget settings. Add custom fields or hide what you don\'t need.',
+  emptyTip: '💡 Tip: Customize fields via Widget settings.',
   brandingPrefix: 'A tool by',
   
   // Tip Banner
@@ -139,7 +139,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   emptyTitle: 'Al je doelgroepinformatie in één overzicht',
   emptySubtitle: 'Maak profielen, groepeer ze in categorieën, en deel ze met je team.',
   emptyAddFirst: '+ Eerste profiel toevoegen',
-  emptyTip: '💡 Tip: Pas profielvelden aan via Widget instellingen. Voeg eigen velden toe of verberg wat je niet nodig hebt.',
+  emptyTip: '💡 Tip: Pas velden aan via Widget instellingen.',
   brandingPrefix: 'Een tool van',
   
   // Tip Banner

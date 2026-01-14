@@ -26,11 +26,11 @@ export function EmptyState({ onAddProfile, strings }: EmptyStateProps) {
         direction="vertical"
         spacing={16}
         horizontalAlignItems="center"
-        width={480}
+        width={560}
       >
-        {/* Title */}
+        {/* Title - h1 style */}
         <Text 
-          fontSize={20} 
+          fontSize={24} 
           fontWeight={700} 
           fill="#1F2937" 
           fontFamily="Inter"
@@ -49,47 +49,38 @@ export function EmptyState({ onAddProfile, strings }: EmptyStateProps) {
           {strings.emptySubtitle}
         </Text>
 
-        {/* Primary CTA Button */}
-        <AutoLayout
-          fill="#2D6BFB"
-          cornerRadius={8}
-          padding={{ horizontal: 20, vertical: 12 }}
-          onClick={onAddProfile}
-          hoverStyle={{ fill: '#1E5BD9' }}
-        >
-          <Text 
-            fontSize={14} 
-            fontWeight={600} 
-            fill="#FFFFFF" 
-            fontFamily="Inter"
+        {/* Primary CTA Button with extra vertical spacing */}
+        <AutoLayout padding={{ top: 16, bottom: 20 }}>
+          <AutoLayout
+            fill="#2D6BFB"
+            cornerRadius={8}
+            padding={{ horizontal: 20, vertical: 12 }}
+            onClick={onAddProfile}
+            hoverStyle={{ fill: '#1E5BD9' }}
           >
-            {strings.emptyAddFirst}
-          </Text>
+            <Text 
+              fontSize={14} 
+              fontWeight={600} 
+              fill="#FFFFFF" 
+              fontFamily="Inter"
+            >
+              {strings.emptyAddFirst}
+            </Text>
+          </AutoLayout>
         </AutoLayout>
 
-        {/* Pro Tip Footer */}
-        <AutoLayout
-          fill="#FFFFFF"
-          stroke="#E5E7EB"
-          strokeWidth={1}
-          cornerRadius={8}
-          padding={16}
-          width="fill-parent"
-          horizontalAlignItems="center"
-          spacing={0}
+        {/* Pro Tip - minimal inline styling, WCAG AA compliant */}
+        <Text 
+          fontSize={11} 
+          fill="#6B7280"
+          fontFamily="Inter"
+          horizontalAlignText="center"
+          width={360}
         >
-          <Text 
-            fontSize={12} 
-            fill="#6B7280" 
-            fontFamily="Inter"
-            horizontalAlignText="center"
-            width="fill-parent"
-          >
-            {strings.emptyTip}
-          </Text>
-        </AutoLayout>
+          {strings.emptyTip}
+        </Text>
 
-        {/* Linku branding */}
+        {/* Linku branding - WCAG AA compliant */}
         <AutoLayout
           direction="horizontal"
           spacing={6}
@@ -98,7 +89,7 @@ export function EmptyState({ onAddProfile, strings }: EmptyStateProps) {
         >
           <Text 
             fontSize={12} 
-            fill="#9CA3AF" 
+            fill="#6B7280" 
             fontFamily="Inter"
           >
             {strings.brandingPrefix}
