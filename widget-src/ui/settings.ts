@@ -242,4 +242,4 @@ export function getSettingsHTML(options: SettingsOptions): string {
 </html>`
 }
 
-export const SETTINGS_SIZE = { width: 380, height: 500 }
+export const SETTINGS_SIZE = { width: 380, height: 580 }
