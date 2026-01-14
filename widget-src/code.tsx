@@ -1924,134 +1924,200 @@ function UserProfilesWidget() {
           </Text>
         </AutoLayout>
 
-        {/* Color legend */}
-        <AutoLayout direction="horizontal" spacing={4}>
-          {categories.map((cat) => (
-            <AutoLayout
-              key={cat.id}
-              width={24}
-              height={24}
-              cornerRadius={6}
-              fill={COLORS[cat.colorKey]?.accent || COLORS.pink.accent}
-              horizontalAlignItems="center"
-              verticalAlignItems="center"
-              tooltip={cat.name}
-            >
-              <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
-                {getProfilesForCategory(cat.id).length}
-              </Text>
-            </AutoLayout>
-          ))}
-          {/* Show uncategorized count if there are any */}
-          {getProfilesForCategory('').length > 0 && (
-            <AutoLayout
-              key="uncategorized"
-              width={24}
-              height={24}
-              cornerRadius={6}
-              fill={COLORS.gray.accent}
-              horizontalAlignItems="center"
-              verticalAlignItems="center"
-              tooltip="Ongecategoriseerd"
-            >
-              <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
-                {getProfilesForCategory('').length}
-              </Text>
-            </AutoLayout>
-          )}
-        </AutoLayout>
+        {/* Color legend - only render if there are items to show */}
+        {(categories.length > 0 || getProfilesForCategory('').length > 0) && (
+          <AutoLayout direction="horizontal" spacing={4}>
+            {categories.map((cat) => (
+              <AutoLayout
+                key={cat.id}
+                width={24}
+                height={24}
+                cornerRadius={6}
+                fill={COLORS[cat.colorKey]?.accent || COLORS.pink.accent}
+                horizontalAlignItems="center"
+                verticalAlignItems="center"
+                tooltip={cat.name}
+              >
+                <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
+                  {getProfilesForCategory(cat.id).length}
+                </Text>
+              </AutoLayout>
+            ))}
+            {/* Show uncategorized count if there are any */}
+            {getProfilesForCategory('').length > 0 && (
+              <AutoLayout
+                key="uncategorized"
+                width={24}
+                height={24}
+                cornerRadius={6}
+                fill={COLORS.gray.accent}
+                horizontalAlignItems="center"
+                verticalAlignItems="center"
+                tooltip="Ongecategoriseerd"
+              >
+                <Text fontSize={12} fontFamily="Inter" fill="#FFFFFF">
+                  {getProfilesForCategory('').length}
+                </Text>
+              </AutoLayout>
+            )}
+          </AutoLayout>
+        )}
       </AutoLayout>
 
       {/* Divider removed for tighter layout */}
 
-      {/* Main content area: horizontal layout */}
-      <AutoLayout
-        direction="horizontal"
-        spacing={16}
-        width="fill-parent"
-      >
-        {/* Left panel: Categories with profiles (fixed width) */}
+      {/* Empty state - Full width, Profile First */}
+      {categories.length === 0 && profilesMap.size === 0 && (
         <AutoLayout
-          direction="vertical"
-          spacing={12}
+          fill="#F9FAFB"
+          cornerRadius={12}
+          width="fill-parent"
+          horizontalAlignItems="center"
+          verticalAlignItems="center"
+          padding={48}
+        >
+          <AutoLayout
+            direction="vertical"
+            spacing={16}
+            horizontalAlignItems="center"
+            width={480}
+          >
+            {/* Title */}
+            <Text 
+              fontSize={20} 
+              fontWeight={700} 
+              fill="#1F2937" 
+              fontFamily="Inter"
+              horizontalAlignText="center"
+            >
+              Al je doelgroepinformatie in één overzicht
+            </Text>
+
+            {/* Subtitle */}
+            <Text 
+              fontSize={14} 
+              fill="#6B7280" 
+              fontFamily="Inter"
+              horizontalAlignText="center"
+            >
+              Maak profielen, groepeer ze in categorieën, en deel ze met je team.
+            </Text>
+
+            {/* Primary CTA Button */}
+            <AutoLayout
+              fill="#EC4899"
+              cornerRadius={8}
+              padding={{ horizontal: 20, vertical: 12 }}
+              onClick={() => addProfile('')}
+              hoverStyle={{ fill: '#DB2777' }}
+            >
+              <Text 
+                fontSize={14} 
+                fontWeight={600} 
+                fill="#FFFFFF" 
+                fontFamily="Inter"
+              >
+                + Eerste profiel aanmaken
+              </Text>
+            </AutoLayout>
+
+            {/* Pro Tip Footer */}
+            <AutoLayout
+              fill="#FFFFFF"
+              stroke="#E5E7EB"
+              strokeWidth={1}
+              cornerRadius={8}
+              padding={16}
+              width="fill-parent"
+              horizontalAlignItems="center"
+              spacing={0}
+            >
+              <Text 
+                fontSize={12} 
+                fill="#6B7280" 
+                fontFamily="Inter"
+                horizontalAlignText="center"
+                width="fill-parent"
+              >
+                💡 Tip: Pas profielvelden aan via Widget instellingen. Voeg eigen velden toe of verberg wat je niet nodig hebt.
+              </Text>
+            </AutoLayout>
+          </AutoLayout>
+        </AutoLayout>
+      )}
+
+      {/* Main content area: horizontal layout (only when not empty) */}
+      {(categories.length > 0 || profilesMap.size > 0) && (
+        <AutoLayout
+          direction="horizontal"
+          spacing={16}
           width="fill-parent"
         >
-          {categories
-            .sort((a, b) => a.order - b.order)
-            .map((category) => (
+          {/* Left panel: Categories with profiles */}
+          <AutoLayout
+            direction="vertical"
+            spacing={12}
+            width="fill-parent"
+          >
+            {categories
+              .sort((a, b) => a.order - b.order)
+              .map((category) => (
+                <CategorySection
+                  key={category.id}
+                  category={category}
+                  profiles={getProfilesForCategory(category.id)}
+                  allProfiles={profilesMap}
+                  expandedId={expandedId}
+                  onExpand={setExpandedId}
+                  onUpdateProfile={updateProfile}
+                  onDeleteProfile={deleteProfile}
+                  onAddProfile={() => addProfile(category.id)}
+                  onEditCategory={() => editCategory(category)}
+                  onDeleteCategory={() => deleteCategory(category)}
+                />
+              ))}
+
+            {/* Uncategorized section */}
+            {getProfilesForCategory('').length > 0 && (
               <CategorySection
-                key={category.id}
-                category={category}
-                profiles={getProfilesForCategory(category.id)}
+                key="uncategorized"
+                category={{
+                  id: '',
+                  name: 'Ongecategoriseerd',
+                  icon: '📂',
+                  colorKey: 'gray',
+                  order: 999,
+                }}
+                profiles={getProfilesForCategory('')}
                 allProfiles={profilesMap}
                 expandedId={expandedId}
                 onExpand={setExpandedId}
                 onUpdateProfile={updateProfile}
                 onDeleteProfile={deleteProfile}
-                onAddProfile={() => addProfile(category.id)}
-                onEditCategory={() => editCategory(category)}
-                onDeleteCategory={() => deleteCategory(category)}
+                onAddProfile={() => addProfile('')}
+                onEditCategory={() => {}}
+                onDeleteCategory={() => {}}
               />
-            ))}
+            )}
+          </AutoLayout>
 
-          {/* Uncategorized section */}
-          {getProfilesForCategory('').length > 0 && (
-            <CategorySection
-              key="uncategorized"
-              category={{
-                id: '',
-                name: 'Ongecategoriseerd',
-                icon: '📂',
-                colorKey: 'gray',
-                order: 999,
-              }}
-              profiles={getProfilesForCategory('')}
-              allProfiles={profilesMap}
-              expandedId={expandedId}
-              onExpand={setExpandedId}
-              onUpdateProfile={updateProfile}
-              onDeleteProfile={deleteProfile}
-              onAddProfile={() => addProfile('')}
-              onEditCategory={() => {}}
-              onDeleteCategory={() => {}}
-            />
-          )}
-
-          {/* Empty state */}
-          {categories.length === 0 && profilesMap.size === 0 && (
-            <AutoLayout
-              direction="vertical"
-              spacing={8}
-              padding={32}
-              horizontalAlignItems="center"
-              width="fill-parent"
-            >
-              <Text fontSize={14} fill="#6B7280" fontFamily="Inter">
-                Nog geen categorieën
-              </Text>
-              <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
-                Klik op de widget → "Categorie toevoegen"
-              </Text>
-            </AutoLayout>
-          )}
+          {/* Right panel: Detail view */}
+          <DetailPanel
+            expandedProfile={expandedProfile}
+            profileNumber={expandedProfileNumber}
+            category={expandedCategory}
+            onCollapse={() => setExpandedId(null)}
+            onUpdate={updateProfile}
+            onDelete={() => {
+              if (expandedProfile) {
+                return showDeleteConfirmationUI('profile', expandedProfile.id, expandedProfile.name)
+              }
+            }}
+            onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
+            widgetSettings={migratedSettings}
+          />
         </AutoLayout>
-
-        {/* Right panel: Detail view (always visible) */}
-        <DetailPanel
-          expandedProfile={expandedProfile}
-          profileNumber={expandedProfileNumber}
-          category={expandedCategory}
-          onCollapse={() => setExpandedId(null)}
-          onUpdate={updateProfile}
-          onDelete={() => {
-            if (expandedProfile) {
-              return showDeleteConfirmationUI('profile', expandedProfile.id, expandedProfile.name)
-            }
-          }}
-          onEditCategory={() => expandedProfile && showCategoryPickerUI(expandedProfile.id, expandedProfile.categoryId)}
-          widgetSettings={migratedSettings}
-        />
-      </AutoLayout>
+      )}
     </AutoLayout>
   )
 }
