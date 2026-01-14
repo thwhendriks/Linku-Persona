@@ -177,7 +177,7 @@ export function CategorySection({
         </AutoLayout>
       ) : (
         <AutoLayout
-          padding={12}
+          padding={{ top: 12, bottom: 20, left: 12, right: 12 }}
           horizontalAlignItems="center"
           width="fill-parent"
         >
