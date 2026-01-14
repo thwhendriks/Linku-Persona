@@ -5,7 +5,6 @@
 export interface Profile {
   id: string
   name: string
-  shortName: string
   categoryId: string  // Empty string = uncategorized
   description: string
   quote: string

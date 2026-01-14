@@ -40,7 +40,6 @@ const STRINGS_EN = {
   
   // Profiles
   newProfile: 'New profile',
-  newProfileShort: 'New',
   profileNamePlaceholder: 'Profile name...',
   deleteProfile: 'Delete profile',
   noCategory: 'No category',
@@ -161,7 +160,6 @@ const STRINGS_NL: typeof STRINGS_EN = {
   
   // Profiles
   newProfile: 'Nieuw profiel',
-  newProfileShort: 'Nieuw',
   profileNamePlaceholder: 'Profielnaam...',
   deleteProfile: 'Profiel verwijderen',
   noCategory: 'Geen categorie',

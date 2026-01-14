@@ -323,11 +323,10 @@ function UserProfilesWidget() {
     if (sendPayload) {
       const profiles: Record<string, Profile> = {}
       Array.from(profilesMap.entries()).forEach(([key, profile]) => {
-        const { description, quote, tasks, context, customFields, id, name, shortName, categoryId } = profile
+        const { description, quote, tasks, context, customFields, id, name, categoryId } = profile
         profiles[key] = {
           id,
           name,
-          shortName,
           categoryId,
           description,
           quote,
@@ -366,7 +365,6 @@ function UserProfilesWidget() {
     const newProfile: Profile = {
       id: newId,
       name: STRINGS.newProfile,
-      shortName: STRINGS.newProfileShort,
       categoryId,
       description: '',
       quote: '',
@@ -378,12 +376,6 @@ function UserProfilesWidget() {
   }
 
   function updateProfile(profile: Profile) {
-    if (profile.name && profile.name !== STRINGS.newProfile) {
-      const words = profile.name.split(' ')
-      profile.shortName = words.length > 2
-        ? words.slice(0, 2).join(' ')
-        : profile.name
-    }
     profilesMap.set(profile.id, profile)
   }
 

@@ -56,7 +56,7 @@ export function MiniCard({ profile, number, colors, onExpand, isSelected = false
         fontFamily="Inter"
         width="fill-parent"
       >
-        {profile.shortName || profile.name}
+        {profile.name}
       </Text>
     </AutoLayout>
   )

@@ -54,7 +54,6 @@ widget-src/
 interface Profile {
   id: string
   name: string
-  shortName: string
   categoryId: string        // '' = uncategorized
   description: string
   quote: string
