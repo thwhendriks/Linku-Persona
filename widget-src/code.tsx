@@ -380,7 +380,7 @@ function ExpandedCard({
               onUpdate({ ...profile, quote: cleanQuote })
             }}
             fontSize={13}
-            fill="#6B7280"
+            fill="#1F2937"
             fontFamily="Inter"
             width="fill-parent"
             inputBehavior="multiline"
@@ -415,7 +415,7 @@ function ExpandedCard({
             placeholder="Bijv. Grote instellingen, Zorg, Onderwijs..."
             onTextEditEnd={(e) => onUpdate({ ...profile, context: e.characters })}
             fontSize={12}
-            fill="#374151"
+            fill="#1F2937"
             fontFamily="Inter"
             width="fill-parent"
           />
@@ -449,7 +449,7 @@ function ExpandedCard({
             placeholder="Beschrijf dit profiel..."
             onTextEditEnd={(e) => onUpdate({ ...profile, description: e.characters })}
             fontSize={13}
-            fill="#374151"
+            fill="#1F2937"
             fontFamily="Inter"
             width="fill-parent"
             inputBehavior="multiline"
@@ -528,7 +528,7 @@ function ExpandedCard({
                       onUpdate({ ...profile, tasks: newTasks })
                     }}
                     fontSize={12}
-                    fill="#374151"
+                    fill="#1F2937"
                     fontFamily="Inter"
                     width="fill-parent"
                   />
@@ -560,7 +560,7 @@ function ExpandedCard({
             onClick={onDelete}
             hoverStyle={{ fill: '#FEE2E2' }}
           >
-            <Text fontSize={11} fill="#EF4444" fontFamily="Inter">
+            <Text fontSize={11} fill="#DC2626" fontFamily="Inter">
               Profiel verwijderen
             </Text>
           </AutoLayout>
@@ -1596,7 +1596,7 @@ function UserProfilesWidget() {
               <Text fontSize={14} fill="#6B7280" fontFamily="Inter">
                 Nog geen categorieën
               </Text>
-              <Text fontSize={12} fill="#D1D5DB" fontFamily="Inter">
+              <Text fontSize={12} fill="#6B7280" fontFamily="Inter">
                 Klik op de widget → "Categorie toevoegen"
               </Text>
             </AutoLayout>
