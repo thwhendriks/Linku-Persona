@@ -56,8 +56,8 @@ export function getSettingsHTML(options: SettingsOptions): string {
     .save-btn:hover { background: #1E5BD9; }
     .section-divider { height: 1px; background: #e5e7eb; margin: 16px 0; }
     .language-section { margin-bottom: 16px; }
-    .language-label { font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .language-select { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: Inter, -apple-system, sans-serif; background: #fff; cursor: pointer; }
+    .language-label { display: block; font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .language-select { width: 100%; padding: 10px 36px 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: Inter, -apple-system, sans-serif; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; appearance: none; -webkit-appearance: none; cursor: pointer; }
     .language-select:focus { outline: none; border-color: #2D6BFB; }
   </style>
 </head>

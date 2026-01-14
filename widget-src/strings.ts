@@ -122,7 +122,7 @@ const STRINGS_EN = {
   // Language Settings
   languageLabel: 'Language',
   languageEnglish: 'English',
-  languageDutch: 'Nederlands',
+  languageDutch: 'Nederlands (Dutch)',
 
   // Built-in Field Labels
   fieldQuote: 'Quote',
@@ -246,7 +246,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   // Language Settings
   languageLabel: 'Taal',
   languageEnglish: 'English',
-  languageDutch: 'Nederlands',
+  languageDutch: 'Nederlands (Dutch)',
 
   // Built-in Field Labels
   fieldQuote: 'Quote',
