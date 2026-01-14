@@ -1461,7 +1461,7 @@ function UserProfilesWidget() {
   return (
     <AutoLayout
       direction="vertical"
-      spacing={8}
+      spacing={16}
       padding={20}
       cornerRadius={16}
       fill="#FFFFFF"
