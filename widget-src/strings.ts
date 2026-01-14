@@ -31,6 +31,7 @@ const STRINGS_EN = {
   editCategory: 'Edit category',
   categoryEdit: 'Edit',
   categoryDelete: 'Delete',
+  addCategory: '+ Add category',
   
   // Category Form
   categoryFormName: 'Name',
@@ -151,6 +152,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   editCategory: 'Categorie bewerken',
   categoryEdit: 'Bewerken',
   categoryDelete: 'Verwijderen',
+  addCategory: '+ Categorie toevoegen',
   
   // Category Form
   categoryFormName: 'Naam',

@@ -612,6 +612,29 @@ function UserProfilesWidget() {
                 strings={STRINGS}
               />
             )}
+
+            {/* Add Category Button */}
+            <AutoLayout
+              width="fill-parent"
+              height={48}
+              cornerRadius={12}
+              stroke="#D1D5DB"
+              strokeWidth={1}
+              strokeDashPattern={[4, 4]}
+              horizontalAlignItems="center"
+              verticalAlignItems="center"
+              onClick={() => showCategoryFormUI()}
+              hoverStyle={{ fill: '#F9FAFB' }}
+            >
+              <Text
+                fontSize={14}
+                fontWeight={500}
+                fill="#6B7280"
+                fontFamily="Inter"
+              >
+                {STRINGS.addCategory}
+              </Text>
+            </AutoLayout>
           </AutoLayout>
 
           {/* Right panel: Detail view */}
