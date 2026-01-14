@@ -708,24 +708,29 @@ function CategorySection({
 
           {/* Action Group */}
           <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
-            <AutoLayout
-              padding={6}
-              cornerRadius={6}
-              onClick={onEditCategory}
-              hoverStyle={{ fill: '#F3F4F6' }}
-              tooltip="Bewerken"
-            >
-              <SVG src={EditIcon} />
-            </AutoLayout>
-            <AutoLayout
-              padding={6}
-              cornerRadius={6}
-              onClick={onDeleteCategory}
-              hoverStyle={{ fill: '#FEE2E2' }}
-              tooltip="Verwijderen"
-            >
-              <SVG src={TrashIcon} />
-            </AutoLayout>
+            {/* Only show edit and delete buttons for actual categories (not uncategorized) */}
+            {category.id !== '' && (
+              <>
+                <AutoLayout
+                  padding={6}
+                  cornerRadius={6}
+                  onClick={onEditCategory}
+                  hoverStyle={{ fill: '#F3F4F6' }}
+                  tooltip="Bewerken"
+                >
+                  <SVG src={EditIcon} />
+                </AutoLayout>
+                <AutoLayout
+                  padding={6}
+                  cornerRadius={6}
+                  onClick={onDeleteCategory}
+                  hoverStyle={{ fill: '#FEE2E2' }}
+                  tooltip="Verwijderen"
+                >
+                  <SVG src={TrashIcon} />
+                </AutoLayout>
+              </>
+            )}
 
             {/* Compact Plus Button */}
             <AutoLayout
