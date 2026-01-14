@@ -43,7 +43,12 @@ export function DetailPanel({
         fill="#F9FAFB"
         cornerRadius={12}
       >
-        <Text fontSize={13} fill="#6B7280" fontFamily="Inter">
+        <Text 
+          fontSize={13} 
+          fill="#6B7280" 
+          fontFamily="Inter" 
+          horizontalAlignText="center"
+        >
           {strings.detailPanelEmpty}
         </Text>
       </AutoLayout>
