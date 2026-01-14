@@ -18,11 +18,11 @@ const STRINGS_EN = {
   emptyTitle: 'All your audience insights in one place',
   emptySubtitle: 'Create profiles, group them into categories, and share with your team.',
   emptyAddFirst: '+ Add first profile',
-  emptyTip: '💡 Tip: Customize fields via Widget settings.',
+  emptyTip: '💡 Tip: Customize profile fields via Widget settings.',
   brandingPrefix: 'A tool by',
   
   // Tip Banner
-  tipMessage: 'Tip: Customize profile fields via Widget settings in the menu.',
+  tipMessage: 'Tip: Customize profile fields (like "quote" or "context") via Widget settings in the menu.',
   
   // Categories
   uncategorized: 'Uncategorized',
@@ -62,7 +62,7 @@ const STRINGS_EN = {
   close: 'Close',
   
   // Settings
-  settingsTitle: 'Profile Fields',
+  settingsTitle: 'Widget settings',
   settingsSubtitle: 'Choose which fields are visible and in what order',
   addField: '+ Add new field',
   fieldNamePlaceholder: 'Field name...',
@@ -139,11 +139,11 @@ const STRINGS_NL: typeof STRINGS_EN = {
   emptyTitle: 'Al je doelgroepinformatie in één overzicht',
   emptySubtitle: 'Maak profielen, groepeer ze in categorieën, en deel ze met je team.',
   emptyAddFirst: '+ Eerste profiel toevoegen',
-  emptyTip: '💡 Tip: Pas velden aan via Widget instellingen.',
+  emptyTip: '💡 Tip: Pas profielvelden aan via Widget instellingen.',
   brandingPrefix: 'Een tool van',
   
   // Tip Banner
-  tipMessage: 'Tip: Pas profielvelden aan via Widget instellingen in het menu.',
+  tipMessage: 'Tip: Pas profielvelden (zoals "quote" of "context") aan via Widget instellingen in het menu.',
   
   // Categories
   uncategorized: 'Ongecategoriseerd',
@@ -183,7 +183,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   close: 'Sluiten',
   
   // Settings
-  settingsTitle: 'Profielvelden',
+  settingsTitle: 'Widget instellingen',
   settingsSubtitle: 'Bepaal welke velden zichtbaar zijn en in welke volgorde',
   addField: '+ Nieuw veld toevoegen',
   fieldNamePlaceholder: 'Veldnaam...',
