@@ -32,8 +32,6 @@ interface Profile {
   name: string
   shortName: string
   categoryId: string  // Empty string = uncategorized
-  level: 'Basis' | 'Gevorderd' | 'Expert'
-  orgSize: 'S' | 'M' | 'L' | 'XL' | 'Alle' | 'Extern'
   description: string
   quote: string
   tasks: string[]
@@ -1029,15 +1027,32 @@ function UserProfilesWidget() {
       if (msg.type === 'importData' && msg.data) {
         try {
           const data = JSON.parse(msg.data)
+          
+          // Import widget title
+          if (data.widgetTitle) {
+            setWidgetTitle(data.widgetTitle)
+          }
+          
+          // Import widget settings (field configuration)
+          if (data.widgetSettings) {
+            setWidgetSettings(data.widgetSettings)
+          }
+          
+          // Import categories
           if (data.categories) {
             setCategories(data.categories)
           }
+          
+          // Import profiles (with legacy field cleanup)
           if (data.profiles) {
             profilesMap.keys().forEach(key => profilesMap.delete(key))
             Object.entries(data.profiles).forEach(([key, profile]) => {
-              profilesMap.set(key, profile as Profile)
+              // Strip legacy fields (level, orgSize) if present
+              const { level, orgSize, ...cleanProfile } = profile as Profile & { level?: string; orgSize?: string }
+              profilesMap.set(key, cleanProfile as Profile)
             })
           }
+          
           figma.closePlugin()
           figma.notify('Data succesvol geïmporteerd')
         } catch (e) {
@@ -1407,7 +1422,7 @@ function UserProfilesWidget() {
         <body>
           <h3>Importeer JSON</h3>
           <p class="hint">Plak hier de geëxporteerde JSON data</p>
-          <textarea id="data" placeholder='{"categories": [...], "profiles": {...}}'></textarea>
+          <textarea id="data" placeholder='{"widgetTitle": "...", "widgetSettings": {...}, "categories": [...], "profiles": {...}}'></textarea>
           <button id="submit">Importeren</button>
           <script>
             document.getElementById('submit').onclick = () => {
@@ -1676,12 +1691,26 @@ function UserProfilesWidget() {
       const profiles: Record<string, Profile> = {}
       // Fix: Use Array.from to iterate over the SyncedMap entries iterator
       Array.from(profilesMap.entries()).forEach(([key, profile]) => {
-        profiles[key] = profile
+        // Clean profile: ensure no legacy fields are exported
+        const { description, quote, tasks, context, customFields, id, name, shortName, categoryId } = profile
+        profiles[key] = {
+          id,
+          name,
+          shortName,
+          categoryId,
+          description,
+          quote,
+          tasks,
+          context,
+          ...(customFields && Object.keys(customFields).length > 0 ? { customFields } : {})
+        }
       })
 
       const data = {
-        version: '1.0.0',
+        version: '2.0.0',
         exportedAt: new Date().toISOString(),
+        widgetTitle,
+        widgetSettings: migratedSettings,
         categories,
         profiles,
       }
@@ -1813,8 +1842,6 @@ function UserProfilesWidget() {
       name: 'Nieuw profiel',
       shortName: 'Nieuw',
       categoryId,
-      level: 'Basis',
-      orgSize: 'Alle',
       description: '',
       quote: '',
       tasks: [],
