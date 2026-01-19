@@ -61,6 +61,10 @@ export function getCategoryFormHTML(options: CategoryFormOptions): string {
     input { width: 100%; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
     input:focus { outline: none; border-color: #2D6BFB; }
     input::placeholder { color: #9ca3af; }
+    input.error { border-color: #ef4444; }
+    input.error:focus { border-color: #dc2626; }
+    .error-message { color: #ef4444; font-size: 12px; margin-top: -4px; margin-bottom: 8px; display: none; }
+    .error-message.visible { display: block; }
     .icon-section { margin-bottom: 12px; }
     .color-section { margin-bottom: 12px; }
     .preset-grid { 
@@ -141,6 +145,7 @@ export function getCategoryFormHTML(options: CategoryFormOptions): string {
   
   <label>${STRINGS.categoryFormName}</label>
   <input id="name" type="text" placeholder="${STRINGS.categoryFormNamePlaceholder}" value="${initialData?.name || ''}">
+  <div class="error-message" id="name-error">${STRINGS.categoryFormNameRequired}</div>
   
   <div class="icon-section">
     <label>${STRINGS.categoryFormIcon}</label>
@@ -156,10 +161,22 @@ export function getCategoryFormHTML(options: CategoryFormOptions): string {
   
   <button type="button" class="submit-btn" id="submit">${buttonText}</button>
   <script>
+    const nameInput = document.getElementById('name');
+    const nameError = document.getElementById('name-error');
     const iconInput = document.getElementById('icon');
     const colorInput = document.getElementById('color');
     const presetBtns = document.querySelectorAll('.preset-btn');
     const swatchBtns = document.querySelectorAll('.swatch');
+    
+    function showNameError() {
+      nameInput.classList.add('error');
+      nameError.classList.add('visible');
+    }
+    
+    function hideNameError() {
+      nameInput.classList.remove('error');
+      nameError.classList.remove('visible');
+    }
     
     function updatePresetHighlight() {
       const currentValue = iconInput.value;
@@ -204,19 +221,24 @@ export function getCategoryFormHTML(options: CategoryFormOptions): string {
     
     document.getElementById('submit').onclick = () => {
       const id = document.getElementById('id').value
-      const name = document.getElementById('name').value.trim()
+      const name = nameInput.value.trim()
       const icon = iconInput.value || '👤'
       const color = colorInput.value
       
       if (name) {
+        hideNameError();
         const type = id ? 'updateCategory' : 'addCategory'
         parent.postMessage({ pluginMessage: { type, id, name, icon, color } }, '*')
+      } else {
+        showNameError();
       }
     }
-    document.getElementById('name').addEventListener('keypress', (e) => {
+    
+    nameInput.addEventListener('input', hideNameError);
+    nameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') document.getElementById('submit').click()
     })
-    document.getElementById('name').focus()
+    nameInput.focus()
     
     if ('${initialData?.id || ''}') {
         document.getElementById('name').select()

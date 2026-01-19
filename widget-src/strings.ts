@@ -36,6 +36,7 @@ const STRINGS_EN = {
   // Category Form
   categoryFormName: 'Name',
   categoryFormNamePlaceholder: 'E.g. Healthcare professionals',
+  categoryFormNameRequired: 'Please enter a name',
   categoryFormIcon: 'Icon',
   categoryFormColor: 'Color',
   
@@ -157,6 +158,7 @@ const STRINGS_NL: typeof STRINGS_EN = {
   // Category Form
   categoryFormName: 'Naam',
   categoryFormNamePlaceholder: 'Bijv. Zorgprofessionals',
+  categoryFormNameRequired: 'Voer een naam in',
   categoryFormIcon: 'Icon',
   categoryFormColor: 'Kleur',
   
