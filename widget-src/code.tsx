@@ -418,6 +418,40 @@ function UserProfilesWidget() {
     figma.notify(message)
   }
 
+  function moveCategoryUp(categoryId: string) {
+    const sortedCategories = [...categories].sort((a, b) => a.order - b.order)
+    const currentIndex = sortedCategories.findIndex(c => c.id === categoryId)
+    
+    if (currentIndex > 0) {
+      const currentCategory = sortedCategories[currentIndex]
+      const previousCategory = sortedCategories[currentIndex - 1]
+      
+      // Swap order values
+      const tempOrder = currentCategory.order
+      currentCategory.order = previousCategory.order
+      previousCategory.order = tempOrder
+      
+      setCategories([...categories])
+    }
+  }
+
+  function moveCategoryDown(categoryId: string) {
+    const sortedCategories = [...categories].sort((a, b) => a.order - b.order)
+    const currentIndex = sortedCategories.findIndex(c => c.id === categoryId)
+    
+    if (currentIndex < sortedCategories.length - 1) {
+      const currentCategory = sortedCategories[currentIndex]
+      const nextCategory = sortedCategories[currentIndex + 1]
+      
+      // Swap order values
+      const tempOrder = currentCategory.order
+      currentCategory.order = nextCategory.order
+      nextCategory.order = tempOrder
+      
+      setCategories([...categories])
+    }
+  }
+
   // Auto-select first profile on initial load ONLY if none is selected
   useEffect(() => {
     if (!expandedId && profilesMap.size > 0) {
@@ -572,7 +606,7 @@ function UserProfilesWidget() {
           >
             {categories
               .sort((a, b) => a.order - b.order)
-              .map((category) => (
+              .map((category, index, sortedArray) => (
                 <CategorySection
                   key={category.id}
                   category={category}
@@ -585,6 +619,10 @@ function UserProfilesWidget() {
                   onAddProfile={() => addProfile(category.id)}
                   onEditCategory={() => editCategory(category)}
                   onDeleteCategory={() => deleteCategory(category)}
+                  onMoveUp={() => moveCategoryUp(category.id)}
+                  onMoveDown={() => moveCategoryDown(category.id)}
+                  isFirst={index === 0}
+                  isLast={index === sortedArray.length - 1}
                   strings={STRINGS}
                 />
               ))}

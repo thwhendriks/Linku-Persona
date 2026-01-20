@@ -36,6 +36,18 @@ export const GearIcon = `
 </svg>
 `
 
+export const ChevronUpIcon = `
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 15l-6-6-6 6"/>
+</svg>
+`
+
+export const ChevronDownIcon = `
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 9l6 6 6-6"/>
+</svg>
+`
+
 export const LinkuLogo = `
 <svg width="38" height="12" viewBox="0 0 113 36" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M104.908 12.1572V29.0473H96.9606V12.1572H89.013V35.9999H104.908C109.297 35.9999 112.856 32.4412 112.856 28.0524V12.1572H104.908Z" fill="#2D6BFB"/>

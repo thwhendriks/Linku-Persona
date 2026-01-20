@@ -4,7 +4,7 @@
 
 import type { Profile, Category, ColorScheme } from '../types'
 import { COLORS } from '../constants'
-import { getPlusIcon, EditIcon, TrashIcon } from '../icons'
+import { getPlusIcon, EditIcon, TrashIcon, ChevronUpIcon, ChevronDownIcon } from '../icons'
 import type { StringsType } from '../strings'
 import { MiniCard } from './MiniCard'
 
@@ -26,6 +26,10 @@ export interface CategorySectionProps {
   onAddProfile: () => void
   onEditCategory: () => void | Promise<void>
   onDeleteCategory: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+  isFirst: boolean
+  isLast: boolean
   strings: StringsType
 }
 
@@ -40,6 +44,10 @@ export function CategorySection({
   onAddProfile,
   onEditCategory,
   onDeleteCategory,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
   strings,
 }: CategorySectionProps) {
   const colors: ColorScheme = COLORS[category.colorKey] || COLORS.pink
@@ -108,9 +116,29 @@ export function CategorySection({
 
           {/* Action Group */}
           <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
-            {/* Only show edit and delete buttons for actual categories (not uncategorized) */}
+            {/* Only show edit, delete, and reorder buttons for actual categories (not uncategorized) */}
             {category.id !== '' && (
               <>
+                {!isFirst && (
+                  <AutoLayout
+                    padding={6}
+                    cornerRadius={6}
+                    onClick={onMoveUp}
+                    hoverStyle={{ fill: '#F3F4F6' }}
+                  >
+                    <SVG src={ChevronUpIcon} />
+                  </AutoLayout>
+                )}
+                {!isLast && (
+                  <AutoLayout
+                    padding={6}
+                    cornerRadius={6}
+                    onClick={onMoveDown}
+                    hoverStyle={{ fill: '#F3F4F6' }}
+                  >
+                    <SVG src={ChevronDownIcon} />
+                  </AutoLayout>
+                )}
                 <AutoLayout
                   padding={6}
                   cornerRadius={6}
